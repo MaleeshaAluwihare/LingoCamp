@@ -1,25 +1,32 @@
 package com.skillshareplatform.lingocamp.config;
 
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.firestore.Firestore;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
-import java.io.FileInputStream;
+import com.google.firebase.cloud.FirestoreClient;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import java.io.IOException;
+import java.io.InputStream;
 
+@Configuration
 public class FirebaseConfig {
 
-    public void initializeFirebase() throws IOException {
+    @Bean
+    public Firestore firestore() throws IOException {
 
-        FileInputStream serviceAccount = new FileInputStream("src/main/resources/serviceAccountKey.json");
+        InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("serviceAccountKey.json");
 
-        // Initialize Firebase with the service account credentials
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                 .build();
 
-        // Initialize the default FirebaseApp instance
+        // Initialize only if no app exists
         if (FirebaseApp.getApps().isEmpty()) {
             FirebaseApp.initializeApp(options);
         }
+
+        return FirestoreClient.getFirestore();
     }
 }
