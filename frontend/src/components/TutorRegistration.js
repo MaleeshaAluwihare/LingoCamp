@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { storage } from "../firebaseConfig";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 const TutorRegistration = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -14,6 +15,8 @@ const TutorRegistration = () => {
   const [socialLinks, setSocialLinks] = useState([]);
   const [newSpec, setNewSpec] = useState("");
   const [newLink, setNewLink] = useState({ platform: "", url: "" });
+
+  const navigate = useNavigate();
 
   const handleImageUpload = async () => {
     if (!profileImage) return null;
@@ -71,6 +74,7 @@ const TutorRegistration = () => {
       console.log(formData);
       const response = await axios.post("http://localhost:8081/lingocamp/api/tutors/register", formData);
       setMessage(`Registration successful! Tutor ID: ${response.data}`);
+      navigate("/home");
 
     } catch (error) {
       setMessage("Error registering tutor. Try again.");
