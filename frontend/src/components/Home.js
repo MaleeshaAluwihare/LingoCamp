@@ -1,5 +1,5 @@
 import { FiSmartphone, FiUsers, FiGlobe } from 'react-icons/fi';
-import {useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 export default function HomePage() {
@@ -17,8 +17,8 @@ export default function HomePage() {
             <div className="hidden md:flex space-x-8">
               <a href="#features" className="text-gray-600 hover:text-blue-600">Features</a>
               <a href="#pricing" className="text-gray-600 hover:text-blue-600">Pricing</a>
-              <a href={navigate("/tutorlogin")} className="text-gray-600 hover:text-blue-600">Login</a>
-              <a href={navigate("/tutorregistration")} className="text-gray-600 hover:text-blue-600">Register</a>
+              <Link to="/tutorlogin" className="text-gray-600 hover:text-blue-600">Login</Link>
+              <Link to="/tutorregistration" className="text-gray-600 hover:text-blue-600">Register</Link>
             </div>
           </div>
         </div>
