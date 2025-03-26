@@ -17,7 +17,11 @@ public class SecurityConfig {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/lingocamp/api/tutors/**").permitAll()  // Added leading slash
+                .requestMatchers(
+                    "/lingocamp/api/tutors/**",
+                    "/lingocamp/api/tutors/register",
+                    "/lingocamp/api/tutors/completeprofile/**"
+                ).permitAll()  // Added leading slash
                 .anyRequest().authenticated()
             )
             .addFilterBefore(new FirebaseAuthFilter(), UsernamePasswordAuthenticationFilter.class)
