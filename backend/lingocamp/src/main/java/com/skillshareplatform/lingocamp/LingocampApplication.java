@@ -13,7 +13,7 @@ public class LingocampApplication {
 		SpringApplication.run(LingocampApplication.class, args);
 	}
 
-	@GetMapping("/dashboard")
+	@GetMapping("/")
 	public String rootEndpoint(){
 		String message = "Spring Running!";
 		return message;
