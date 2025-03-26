@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth, googleProvider, signInWithPopup } from "../firebaseConfig";
+import { auth, googleProvider, signInWithPopup } from "../../firebaseConfig";
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 const TutorLogin = () => {
     const [email, setEmail] = useState("");
@@ -27,8 +28,20 @@ const TutorLogin = () => {
     // Google Login
     const handleGoogleLogin = async () => {
         try {
-            await signInWithPopup(auth, googleProvider);
-            navigate("/home");
+            const result = await signInWithPopup(auth, googleProvider);
+            const user = result.user;
+            
+            try {
+                // Check if profile exists and is complete
+                await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`);
+                navigate('/home');
+            } catch (error) {
+                if(error.response?.status === 404) { // Profile incomplete
+                    navigate('/tutorcompleteprofile');
+                } else {
+                    throw error;
+                }
+            }
         } catch (err) {
             setError("Google sign-in failed");
         }

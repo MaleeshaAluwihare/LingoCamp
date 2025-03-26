@@ -1,4 +1,4 @@
-package com.skillshareplatform.lingocamp.repository;
+package com.skillshareplatform.lingocamp.repository.TutorManagement;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.WriteResult;
-import com.skillshareplatform.lingocamp.model.TutorModel;
+import com.skillshareplatform.lingocamp.model.TutorManagement.TutorModel;
 
 @Repository
 public class TutorRepository {

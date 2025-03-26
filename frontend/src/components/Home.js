@@ -1,9 +1,9 @@
 import { FiSmartphone, FiUsers, FiGlobe } from 'react-icons/fi';
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 
 export default function HomePage() {
-    const navigate = useNavigate();
+    
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}

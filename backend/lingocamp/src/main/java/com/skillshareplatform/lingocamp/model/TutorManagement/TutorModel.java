@@ -1,7 +1,8 @@
-package com.skillshareplatform.lingocamp.model;
+package com.skillshareplatform.lingocamp.model.TutorManagement;
 
 import java.util.List;
 import com.google.cloud.Timestamp;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,6 +21,7 @@ public class TutorModel {
     private List<String> specialization;
     private List<TutorSocialLink> socialLinks;
     private Timestamp createAt;
+    private boolean profileComplete = false;
 
     public TutorModel(){} //Empty constructor required by Firestore
 

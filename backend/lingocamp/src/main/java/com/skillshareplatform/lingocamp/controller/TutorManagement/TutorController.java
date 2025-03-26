@@ -1,0 +1,87 @@
+package com.skillshareplatform.lingocamp.controller.TutorManagement;
+
+import java.util.concurrent.ExecutionException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.QuerySnapshot;
+import com.skillshareplatform.lingocamp.model.TutorManagement.TutorModel;
+import com.skillshareplatform.lingocamp.service.TutorManagement.TutorService;
+
+@RestController
+@RequestMapping("/lingocamp/api/tutors")
+public class TutorController {
+
+    @Autowired
+    private TutorService tutorService;
+
+    @Autowired
+    private Firestore firestore;
+    
+    //user register
+    @PostMapping("/register")
+    public ResponseEntity<String> registerTutor(@RequestBody TutorModel tutor) {
+        try{
+            //count existing tutors to generate new tutorID
+            QuerySnapshot tutorSnapshot = firestore.collection("Tutors").get().get();
+            int tutorCount = tutorSnapshot.size();
+
+            //Register the tutor and return tutor ID
+            String tutorId = tutorService.registerTutor(tutor, tutorCount);
+            return ResponseEntity.ok(tutorId);  
+
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }catch (ExecutionException | InterruptedException e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while registering the tutor");
+        }
+    }
+
+    // get tutor
+    @GetMapping("/{uid}")
+    public ResponseEntity<TutorModel> getTutorByUid(@PathVariable String uid) {
+        try {
+            DocumentSnapshot doc = firestore.collection("Tutors").document(uid).get().get();
+            
+            if(doc.exists()) {
+                TutorModel tutor = doc.toObject(TutorModel.class);
+                return ResponseEntity.ok(tutor);
+            }
+            
+            return ResponseEntity.notFound().build();
+            
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // Profile completion 
+    @PutMapping("/completeprofile/{uid}")
+    public ResponseEntity<String> completeProfile(
+        @PathVariable String uid,
+        @RequestBody TutorModel tutorData
+    ) {
+        try {
+            QuerySnapshot tutorSnapshot = firestore.collection("Tutors").get().get();
+            int tutorCount = tutorSnapshot.size();
+
+            String result = tutorService.completeTutorProfile(uid, tutorData, tutorCount);
+            return ResponseEntity.ok(result);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error completing profile");
+        }
+    }
+}

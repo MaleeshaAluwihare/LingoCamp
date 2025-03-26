@@ -1,4 +1,4 @@
-package com.skillshareplatform.lingocamp.model;
+package com.skillshareplatform.lingocamp.model.TutorManagement;
 
 import lombok.Getter;
 import lombok.Setter;
