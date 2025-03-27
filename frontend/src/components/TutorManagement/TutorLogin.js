@@ -47,6 +47,10 @@ const TutorLogin = () => {
         }
     };
 
+    const handleGuest = async () => {
+        navigate('/home');
+    }
+
     return (
         <div className="flex justify-center items-center h-screen">
             <div className="bg-white shadow-lg rounded-lg p-8 w-96">
@@ -79,6 +83,11 @@ const TutorLogin = () => {
                 <div className="mt-4 text-center">
                     <button onClick={handleGoogleLogin} className="w-full bg-red-500 text-white p-3 rounded-lg">
                         Sign in with Google
+                    </button>
+                </div>
+                <div className="mt-4 text-center">
+                    <button onClick={handleGuest} className="w-full bg-green-500 text-white p-3 rounded-lg">
+                        Continue as Guest
                     </button>
                 </div>
             </div>
