@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-import { getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, browserSessionPersistence, setPersistence  } from "firebase/auth";
 
 
 const firebaseConfig = {
@@ -19,6 +19,13 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();
 
-console.log("Firebase connected:", app.name);
+(async () => {
+    try {
+      await setPersistence(auth, browserSessionPersistence);
+      console.log("Session persistence enabled");
+    } catch (error) {
+      console.error("Error setting persistence:", error);
+    }
+  })();
 
 export { auth, googleProvider, signInWithEmailAndPassword, signInWithPopup, db, storage };
