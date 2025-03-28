@@ -21,7 +21,8 @@ public class SecurityConfig {
                     "/lingocamp/api/tutors/**",
                     "/lingocamp/api/tutors/register",
                     "/lingocamp/api/tutors/completeprofile/**",
-                    "/lingocamp/api/tutors/updateprofile/**"
+                    "/lingocamp/api/tutors/updateprofile/**",
+                    "/lingocamp/api/tutors/deleteprofile/**"
                 ).permitAll()  // Added leading slash
                 .anyRequest().authenticated()
             )
