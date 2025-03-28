@@ -15,7 +15,7 @@ public class TutorRepository {
     private Firestore firestore;
 
     public ApiFuture<WriteResult> saveTutor(TutorModel tutor){
-        return firestore.collection("Tutors").document(tutor.getTutorID()).set(tutor);
+        return firestore.collection("Tutors").document(tutor.getUid()).set(tutor);
     }
 }
 

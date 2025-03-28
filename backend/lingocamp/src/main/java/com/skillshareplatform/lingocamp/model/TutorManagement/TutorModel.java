@@ -10,7 +10,6 @@ import lombok.Setter;
 @Setter
 public class TutorModel {
 
-    private String tutorID;
     private String firstName;
     private String lastName;
     private String email;
