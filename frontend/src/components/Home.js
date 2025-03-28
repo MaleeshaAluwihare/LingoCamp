@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/react';
-import { FiGlobe, FiUsers, FiSmartphone, FiChevronDown, FiUser, FiSettings, FiLogOut, FiEdit } from 'react-icons/fi';import { Link } from "react-router-dom";
+import { FiGlobe, FiUsers, FiSmartphone, FiChevronDown, FiUser, FiSettings, FiLogOut, FiEdit, FiTrash2 } from 'react-icons/fi';import { Link } from "react-router-dom";
 import { auth } from '../firebaseConfig';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useEffect } from 'react';
@@ -11,6 +11,7 @@ const HomePage = () => {
     const [user] = useAuthState(auth);
     const [tutorData, setTutorData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isGuest, setIsGuest] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -47,7 +48,33 @@ const HomePage = () => {
       }
     };
 
-    // if(!user) navigate('/home');
+    const handleDeleteProfile = async () => {
+      const confirmation = window.prompt(
+        'Type "DELETE" to confirm permanent profile deletion:'
+      );
+      
+      if (confirmation === "DELETE") {
+        try {
+          await axios.delete(`http://localhost:8081/lingocamp/api/tutors/deleteprofile/${user.uid}`);
+          await auth.signOut();
+          navigate('/home');
+        } catch (error) {
+          console.error('Deletion failed:', error);
+          alert('Profile deletion failed. Please try again.');
+        }
+      } else {
+        alert('Deletion cancelled. Profile remains active.');
+      }
+    };
+
+    useEffect(() => {
+      const guestStatus = localStorage.getItem('isGuest');
+      if (!user && !guestStatus) {
+          navigate('/tutorlogin');
+      }
+      setIsGuest(!!guestStatus);
+  }, [user, navigate]);
+
 
     return (
       <div className="min-h-screen bg-gray-50">
@@ -84,7 +111,7 @@ const HomePage = () => {
                           <button
                             onClick={() => alert('Profile clicked - Add your profile handler')}
                             className={`${
-                              active ? 'bg-gray-100' : ''
+                              active ? 'bg-blue-100' : ''
                             } block w-full px-4 py-2 text-sm text-gray-700 text-left`}
                           >
                             <FiUser className="inline mr-2 h-4 w-4" />
@@ -97,7 +124,7 @@ const HomePage = () => {
                           <button
                             onClick={() => navigate('/tutorprofileupdate')}
                             className={`${
-                              active ? 'bg-gray-100' : ''
+                              active ? 'bg-blue-100' : ''
                             } block w-full px-4 py-2 text-sm text-gray-700 text-left`}
                           >
                             <FiEdit className="inline mr-2 h-4 w-4" />
@@ -108,9 +135,22 @@ const HomePage = () => {
                       <MenuItem>
                         {({ active }) => (
                           <button
+                            onClick={handleDeleteProfile}
+                            className={`${
+                              active ? 'bg-blue-100' : ''
+                            } block w-full px-4 py-2 text-sm text-gray-700 text-left`}
+                          >
+                            <FiTrash2 className="inline mr-2 h-4 w-4" />
+                            Delete Profile
+                          </button>
+                        )}
+                      </MenuItem>
+                      <MenuItem>
+                        {({ active }) => (
+                          <button
                             onClick={() => alert('Settings clicked - Add your settings handler')}
                             className={`${
-                              active ? 'bg-gray-100' : ''
+                              active ? 'bg-blue-100' : ''
                             } block w-full px-4 py-2 text-sm text-gray-700 text-left`}
                           >
                             <FiSettings className="inline mr-2 h-4 w-4" />
@@ -123,7 +163,7 @@ const HomePage = () => {
                           <button
                             onClick={handleLogout}
                             className={`${
-                              active ? 'bg-gray-100' : ''
+                              active ? 'bg-blue-100' : ''
                             } block w-full px-4 py-2 text-sm text-gray-700 text-left`}
                           >
                             <FiLogOut className="inline mr-2 h-4 w-4" />
