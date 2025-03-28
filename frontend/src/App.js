@@ -4,6 +4,7 @@ import TutorRegistration from './components/TutorManagement/TutorRegistration';
 import TutorLogin from './components/TutorManagement/TutorLogin';
 import HomePage from './components/Home';
 import TutorCompleteProfile from './components/TutorManagement/TutorProfileCompletion';
+import TutorProfileUpdate from './components/TutorManagement/TutorProfileUpdate';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path='/tutorlogin' element={<TutorLogin/>}/>
         <Route path='/tutorregistration' element={<TutorRegistration/>}/>
         <Route path='/tutorcompleteprofile' element={<TutorCompleteProfile/>}/>
+        <Route path='/tutorprofileupdate' element={<TutorProfileUpdate/>}/>
       </Routes>
     </Router>
   );
