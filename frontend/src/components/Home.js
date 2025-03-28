@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/react';
-import { FiGlobe, FiUsers, FiSmartphone, FiChevronDown, FiUser, FiSettings, FiLogOut, FiEdit, FiTrash2 } from 'react-icons/fi';import { Link } from "react-router-dom";
+import { FiGlobe, FiUsers, FiSmartphone, FiChevronDown, FiUser, FiSettings, FiLogOut, FiEdit, FiTrash2 } from 'react-icons/fi';
+import { Link } from "react-router-dom";
 import { auth } from '../firebaseConfig';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useEffect } from 'react';
