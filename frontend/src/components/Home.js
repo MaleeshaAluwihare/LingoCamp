@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/react';
-import { FiGlobe, FiUsers, FiSmartphone, FiChevronDown, FiUser, FiSettings, FiLogOut } from 'react-icons/fi';import { Link } from "react-router-dom";
+import { FiGlobe, FiUsers, FiSmartphone, FiChevronDown, FiUser, FiSettings, FiLogOut, FiEdit } from 'react-icons/fi';import { Link } from "react-router-dom";
 import { auth } from '../firebaseConfig';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useEffect } from 'react';
@@ -18,7 +18,6 @@ const HomePage = () => {
         if(user) {
           try {
             const response = await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`);
-            console.log("idnidiidv",response.data)
             setTutorData(response.data);
           }catch(error){
             console.error("Error fetching tutor data:", error);
@@ -90,6 +89,19 @@ const HomePage = () => {
                           >
                             <FiUser className="inline mr-2 h-4 w-4" />
                             Profile
+                          </button>
+                        )}
+                      </MenuItem>
+                      <MenuItem>
+                        {({ active }) => (
+                          <button
+                            onClick={() => navigate('/tutorprofileupdate')}
+                            className={`${
+                              active ? 'bg-gray-100' : ''
+                            } block w-full px-4 py-2 text-sm text-gray-700 text-left`}
+                          >
+                            <FiEdit className="inline mr-2 h-4 w-4" />
+                            Update Profile
                           </button>
                         )}
                       </MenuItem>
