@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -67,7 +67,7 @@ public class TutorController {
     }
 
     // Profile completion 
-    @PutMapping("/completeprofile/{uid}")
+    @PostMapping("/completeprofile/{uid}")
     public ResponseEntity<String> completeProfile(
         @PathVariable String uid,
         @RequestBody TutorModel tutorData
@@ -82,6 +82,22 @@ public class TutorController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error completing profile");
+        }
+    }
+
+    // Update existing profile (PATCH for partial updates)
+    @PatchMapping("updateprofile/{uid}")
+    public ResponseEntity<String> updateTutorProfile(
+        @PathVariable String uid,
+        @RequestBody TutorModel tutorData
+    ) {
+        try {
+            String result = tutorService.updateTutorProfile(uid, tutorData);
+            return ResponseEntity.ok(result);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating profile");
         }
     }
 }
