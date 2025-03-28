@@ -48,8 +48,9 @@ const TutorLogin = () => {
     };
 
     const handleGuest = async () => {
+        localStorage.setItem('isGuest', 'true');
         navigate('/home');
-    }
+    };
 
     return (
         <div className="flex justify-center items-center h-screen">
