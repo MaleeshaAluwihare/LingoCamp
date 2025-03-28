@@ -20,7 +20,8 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/lingocamp/api/tutors/**",
                     "/lingocamp/api/tutors/register",
-                    "/lingocamp/api/tutors/completeprofile/**"
+                    "/lingocamp/api/tutors/completeprofile/**",
+                    "/lingocamp/api/tutors/updateprofile/**"
                 ).permitAll()  // Added leading slash
                 .anyRequest().authenticated()
             )
