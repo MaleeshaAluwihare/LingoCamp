@@ -68,7 +68,7 @@ const ProfileCompletion = () => {
                 profileComplete: true
             };
 
-            await axios.put(`http://localhost:8081/lingocamp/api/tutors/completeprofile/${user.uid}`, formData);
+            await axios.post(`http://localhost:8081/lingocamp/api/tutors/completeprofile/${user.uid}`, formData);
             navigate('/home');
         } catch (error) {
             console.error('Profile completion failed:', error);
