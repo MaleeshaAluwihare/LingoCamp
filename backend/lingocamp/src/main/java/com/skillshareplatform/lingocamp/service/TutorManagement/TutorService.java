@@ -46,11 +46,6 @@ public class TutorService {
         return matcher.matches();
     }
 
-    //Auto-generate tutorID
-    private String generateTutorID(int count){
-        return String.format("T%04d",count+1);
-    }
-
     public String registerTutor(TutorModel tutor, int tutorCount) throws ExecutionException, InterruptedException{
 
         //Email validation
@@ -64,9 +59,6 @@ public class TutorService {
         if(!existingTutors.isEmpty()){
             throw new IllegalArgumentException("Email is already in use");
         }
-
-        //Generate unique TutorId
-        tutor.setTutorID(generateTutorID(tutorCount));
 
         //Set createAt timeStamp
         tutor.setCreateAt(Timestamp.now());
@@ -85,9 +77,7 @@ public class TutorService {
         if (!doc.exists()) {
             // Handle new Google-signup profile
             tutorData.setUid(uid);
-            
-            tutorData.setTutorID(generateTutorID(tutorCount));
-            
+                        
             if (!isValidEmail(tutorData.getEmail())) {
                 throw new IllegalArgumentException("Invalid email format");
             }
@@ -113,9 +103,48 @@ public class TutorService {
         updates.put("socialLinks", tutorData.getSocialLinks());
         updates.put("profileComplete", true);
 
-        // firestore.collection("Tutors").document(uid).update(updates).get();
-        // return "Profile updated successfully";
         tutorRepository.saveTutor(tutorData).get();
+        return "Profile updated successfully";
+    }
+
+    public String updateTutorProfile(String uid, TutorModel tutorData) 
+        throws ExecutionException, InterruptedException {
+        
+        DocumentSnapshot doc = firestore.collection("Tutors").document(uid).get().get();
+        
+        if (!doc.exists()) {
+            throw new IllegalArgumentException("User profile not found");
+        }
+
+        Map<String, Object> updates = new HashMap<>();
+        
+        if (tutorData.getFirstName() != null) {
+            updates.put("firstName", tutorData.getFirstName());
+        }
+        if (tutorData.getLastName() != null) {
+            updates.put("lastName", tutorData.getLastName());
+        }
+        if (tutorData.getExperience() != -1) {
+            updates.put("experience", tutorData.getExperience());
+        }
+        if (tutorData.getPhoneNumber() != null) {
+            updates.put("experience", tutorData.getPhoneNumber());
+        }
+        if (tutorData.getProfileImageUrl() != null) {
+            updates.put("profileImage", tutorData.getProfileImageUrl());
+        }
+        if (tutorData.getSpecialization() != null) {
+            updates.put("socialLinks", tutorData.getSocialLinks());
+        }
+        if (tutorData.getSocialLinks() != null) {
+            updates.put("specialization", tutorData.getSpecialization());
+        }
+        
+        updates.remove("uid"); // Prevent UID changes
+        updates.remove("email"); // Email managed by Firebase Auth
+        updates.remove("createAt"); // Preserve original creation date
+        
+        firestore.collection("Tutors").document(uid).update(updates).get();
         return "Profile updated successfully";
     }
 }
