@@ -58,7 +58,7 @@ const HomePage = () => {
         try {
           await axios.delete(`http://localhost:8081/lingocamp/api/tutors/deleteprofile/${user.uid}`);
           await auth.signOut();
-          navigate('/home');
+          navigate('/tutorlogin');
         } catch (error) {
           console.error('Deletion failed:', error);
           alert('Profile deletion failed. Please try again.');
