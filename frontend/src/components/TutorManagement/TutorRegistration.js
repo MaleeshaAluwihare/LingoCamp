@@ -7,7 +7,6 @@ import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { FaFacebook, FaInstagram, FaYoutube, FaLinkedin, FaGithub, FaMedium, FaReddit, FaGlobe,  } from 'react-icons/fa';
 import { FiChevronDown, FiTrash2, FiPlus } from 'react-icons/fi';
-import * as countryCodes from "country-codes-list";
 
 const TutorRegistration = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -300,7 +299,6 @@ const TutorRegistration = () => {
                     onChange={(e) => setNewLink({ ...newLink, customPlatform: e.target.value })}
                     className="p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
                     placeholder="Platform Name"
-                    required
                   />
                 )}
 
@@ -311,7 +309,6 @@ const TutorRegistration = () => {
                   className="p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   placeholder="Profile URL"
                   pattern={SOCIAL_PLATFORMS.find(p => p.value === newLink.platform)?.pattern?.source || ''}
-                  required
                 />
 
                 <button
