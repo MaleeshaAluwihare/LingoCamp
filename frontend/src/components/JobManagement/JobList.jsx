@@ -32,6 +32,9 @@ const JobList = ({ jobs }) => {
                   <div className="text-sm text-gray-500">
                     Posted {job.posted} - {job.applicants} Applicants
                   </div>
+                  <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                    Apply
+                  </button>
                 </div>
               </div>
             ))
