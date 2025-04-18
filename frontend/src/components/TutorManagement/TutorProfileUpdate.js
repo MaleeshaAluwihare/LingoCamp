@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, storage } from '../../firebaseConfig';
 import { useNavigate } from 'react-router-dom';
-import { FiUploadCloud, FiX, FiPlus, FiLink, FiUser, FiBriefcase, FiSmartphone, FiAward } from 'react-icons/fi';
+import { FiUploadCloud, FiX, FiPlus, FiLink, FiUser, FiBriefcase, FiAward } from 'react-icons/fi';
 
 const TutorProfileUpdate = () => {
   const { register, handleSubmit, setValue, formState: { errors } } = useForm();
