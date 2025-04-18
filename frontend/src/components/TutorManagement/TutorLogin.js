@@ -16,6 +16,7 @@ const TutorLogin = () => {
         e.preventDefault();
         try {
             await signInWithEmailAndPassword(auth, email, password);
+            localStorage.removeItem('isGuest');
             navigate("/home");
         } catch (err) {
             setError("Invalid email or password");
@@ -27,6 +28,7 @@ const TutorLogin = () => {
             const result = await signInWithPopup(auth, googleProvider);
             try {
                 await axios.get(`http://localhost:8081/lingocamp/api/tutors/${result.user.uid}`);
+                localStorage.removeItem('isGuest'); 
                 navigate('/home');
             } catch (error) {
                 if(error.response?.status === 404) {
@@ -38,10 +40,10 @@ const TutorLogin = () => {
         }
     };
 
-    const handleGuest = () => {
+    const handleGuest = async () => {
         localStorage.setItem('isGuest', 'true');
         navigate('/home');
-    };
+      };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">
