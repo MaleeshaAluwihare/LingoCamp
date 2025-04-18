@@ -35,13 +35,8 @@ public class TutorController {
     @PostMapping("/register")
     public ResponseEntity<String> registerTutor(@RequestBody TutorModel tutor) {
         try{
-            //count existing tutors to generate new tutorID
-            QuerySnapshot tutorSnapshot = firestore.collection("Tutors").get().get();
-            int tutorCount = tutorSnapshot.size();
-
-            //Register the tutor and return tutor ID
-            String tutorId = tutorService.registerTutor(tutor, tutorCount);
-            return ResponseEntity.ok(tutorId);  
+            tutorService.registerTutor(tutor);
+            return ResponseEntity.ok("Registered successfully");  
 
         }catch (IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
