@@ -49,7 +49,7 @@ public class TutorService {
     }
 
     // Register Tutor
-    public String registerTutor(TutorModel tutor, int tutorCount) throws ExecutionException, InterruptedException{
+    public String registerTutor(TutorModel tutor) throws ExecutionException, InterruptedException{
 
         //Email validation
         if (!isValidEmail(tutor.getEmail())){
