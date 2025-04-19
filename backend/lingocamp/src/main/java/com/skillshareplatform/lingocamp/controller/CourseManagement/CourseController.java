@@ -1,18 +1,17 @@
 package com.skillshareplatform.lingocamp.controller.CourseManagement;
 
 import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
+import com.google.api.core.ApiFuture;
 import com.google.cloud.Timestamp;
 import com.skillshareplatform.lingocamp.model.TutorManagement.CourseModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -24,34 +23,45 @@ public class CourseController {
     private Firestore firestore;
 
     @PostMapping("/create")
-    @PreAuthorize("hasAuthority('ROLE_TUTOR')")
     public ResponseEntity<?> createCourse(
         @RequestBody CourseModel course,
-        @AuthenticationPrincipal Jwt jwt
+        @AuthenticationPrincipal String tutorId  // Changed from Jwt to String
     ) {
         try {
-            String tutorId = jwt.getSubject();
+            // Validate tutor existence
+            DocumentReference tutorRef = firestore.collection("Tutors").document(tutorId);
+            DocumentSnapshot tutorSnapshot = tutorRef.get().get();
             
-            if (!firestore.collection("Tutors").document(tutorId).get().get().exists()) {
+            if (!tutorSnapshot.exists()) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body("Tutor profile not found");
+                        .body(Map.of("error", "Tutor profile not found"));
             }
 
+            // Validate course data
+            if (course.getTitle() == null || course.getTitle().isBlank()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Course title is required"));
+            }
+
+            // Set course metadata
             course.setTutorId(tutorId);
             course.setCreatedAt(Timestamp.now());
             course.setUpdatedAt(Timestamp.now());
+            course.setStatus("DRAFT");
 
-            DocumentReference docRef = firestore.collection("Courses").add(course).get();
-            
-            Map<String, String> response = new HashMap<>();
-            response.put("courseId", docRef.getId());
-            response.put("message", "Course created successfully");
-            
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            // Add to Firestore
+            ApiFuture<DocumentReference> future = firestore.collection("Courses").add(course);
+            DocumentReference docRef = future.get();
+
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(Map.of(
+                        "courseId", docRef.getId(),
+                        "message", "Course created successfully"
+                    ));
 
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error creating course: " + e.getMessage());
+                    .body(Map.of("error", "Course creation failed: " + e.getMessage()));
         }
     }
 }
