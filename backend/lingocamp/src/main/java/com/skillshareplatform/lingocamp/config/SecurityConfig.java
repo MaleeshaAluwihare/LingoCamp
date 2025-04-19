@@ -2,6 +2,7 @@ package com.skillshareplatform.lingocamp.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -18,16 +19,15 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                    "/lingocamp/api/tutors/**",
                     "/lingocamp/api/tutors/register",
-                    "/lingocamp/api/tutors/completeprofile/**",
-                    "/lingocamp/api/tutors/updateprofile/**",
-                    "/lingocamp/api/tutors/deleteprofile/**"
-                ).permitAll()  // Added leading slash
+                    "/lingocamp/api/tutors/login",
+                    "/lingocamp/api/courses" // GET requests only
+                ).permitAll()
+                .requestMatchers(HttpMethod.POST, "/lingocamp/api/courses/create").authenticated()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(new FirebaseAuthFilter(), UsernamePasswordAuthenticationFilter.class)
-            .csrf(csrf -> csrf.disable());  // Consider disabling CSRF for API endpoints
+            .csrf(csrf -> csrf.disable());
 
         return http.build();
     }
