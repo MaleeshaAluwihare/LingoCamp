@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/react';
-import { FiGlobe, FiUsers, FiSmartphone, FiChevronDown, FiUser, FiSettings, FiLogOut, FiEdit, FiTrash2 } from 'react-icons/fi';import { Link } from "react-router-dom";
+import { FiGlobe, FiUsers, FiSmartphone, FiChevronDown, FiUser, FiSettings, FiLogOut, FiEdit, FiTrash2 } from 'react-icons/fi';
+import { Link } from "react-router-dom";
 import { auth } from '../firebaseConfig';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useEffect } from 'react';
@@ -12,6 +13,7 @@ const HomePage = () => {
     const [tutorData, setTutorData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isGuest, setIsGuest] = useState(false);
+    const [tutorProfileComplete, setTutorProfileComplete] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -29,6 +31,40 @@ const HomePage = () => {
       };
       fetchUserData();
     },[user]);
+
+    useEffect(() => {
+      const checkTutorProfile = async () => {
+        if(user && !isGuest) {
+          try {
+            const response = await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`);
+            setTutorProfileComplete(response.data?.profileComplete || false);
+          } catch {
+            setTutorProfileComplete(false);
+          }
+        }
+      };
+      checkTutorProfile();
+    }, [user, isGuest]);
+
+    const handleCreateCourseClick = () => {
+      if (isGuest) {
+        const confirm = window.confirm(
+          'You need a tutor account to create courses. Would you like to register now?'
+        );
+        if (confirm) {
+          navigate('/tutorregistration');
+        }
+      } else if (user) {
+        navigate('/coursecreate');
+      } else {
+        const confirm = window.confirm(
+          'You need to be logged in to create courses. Go to login page now?'
+        );
+        if (confirm) {
+          navigate('/tutorlogin');
+        }
+      }
+    };
 
     const getDisplayName = () => {
       if(tutorData?.firstName) return tutorData.firstName;
@@ -57,7 +93,7 @@ const HomePage = () => {
         try {
           await axios.delete(`http://localhost:8081/lingocamp/api/tutors/deleteprofile/${user.uid}`);
           await auth.signOut();
-          navigate('/home');
+          navigate('/tutorlogin');
         } catch (error) {
           console.error('Deletion failed:', error);
           alert('Profile deletion failed. Please try again.');
@@ -69,11 +105,13 @@ const HomePage = () => {
 
     useEffect(() => {
       const guestStatus = localStorage.getItem('isGuest');
-      if (!user && !guestStatus) {
-          navigate('/tutorlogin');
+      if (user && guestStatus) {
+        localStorage.removeItem('isGuest');
+        setIsGuest(false);
+      } else {
+        setIsGuest(!!guestStatus);
       }
-      setIsGuest(!!guestStatus);
-  }, [user, navigate]);
+    }, [user, navigate]);
 
 
     return (
@@ -203,6 +241,17 @@ const HomePage = () => {
           </div>
         </div>
       </main>
+      <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
+      <button 
+        onClick={handleCreateCourseClick}
+        className={`${
+          isGuest || !user ? 'bg-gray-400 hover:bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'
+        } text-white p-3 rounded-lg transition-colors`}
+        title={isGuest ? "Guest users cannot create courses" : !user ? "Login to create courses" : ""}
+      >
+        Create New Course
+      </button>
+      </div>
 
       {/* Features Section */}
       <section className="py-12 bg-white" id="features">

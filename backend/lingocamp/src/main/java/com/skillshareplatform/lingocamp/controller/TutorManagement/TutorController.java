@@ -5,7 +5,6 @@ import java.util.concurrent.ExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.encrypt.RsaAlgorithm;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -36,13 +35,8 @@ public class TutorController {
     @PostMapping("/register")
     public ResponseEntity<String> registerTutor(@RequestBody TutorModel tutor) {
         try{
-            //count existing tutors to generate new tutorID
-            QuerySnapshot tutorSnapshot = firestore.collection("Tutors").get().get();
-            int tutorCount = tutorSnapshot.size();
-
-            //Register the tutor and return tutor ID
-            String tutorId = tutorService.registerTutor(tutor, tutorCount);
-            return ResponseEntity.ok(tutorId);  
+            tutorService.registerTutor(tutor);
+            return ResponseEntity.ok("Registered successfully");  
 
         }catch (IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
