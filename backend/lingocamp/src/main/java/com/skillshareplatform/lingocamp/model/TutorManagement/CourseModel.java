@@ -14,7 +14,8 @@ public class CourseModel {
     private String title;
     private String description;
     private double price;
-    private int durationWeeks;        // Course duration in weeks
+    private int durationWeeks;
+    private String coverImage; 
     private List<StudyMaterial> studyMaterials;
     private Timestamp createdAt;
     private Timestamp updatedAt;
