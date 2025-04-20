@@ -18,8 +18,11 @@ import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import com.skillshareplatform.lingocamp.model.TutorManagement.TutorModel;
 import com.skillshareplatform.lingocamp.service.TutorManagement.TutorService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/lingocamp/api/tutors")
@@ -47,8 +50,15 @@ public class TutorController {
 
     // get tutor
     @GetMapping("/{uid}")
-    public ResponseEntity<TutorModel> getTutorByUid(@PathVariable String uid) {
+    public ResponseEntity<TutorModel> getTutorByUid(@PathVariable String uid,HttpServletRequest request) {
         try {
+
+            FirebaseToken decodedToken = (FirebaseToken) request.getAttribute("firebaseToken");
+
+            if (decodedToken == null || !decodedToken.getUid().equals(uid)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // user trying to access another user's data
+            }
+            
             DocumentSnapshot doc = firestore.collection("Tutors").document(uid).get().get();
             
             if(doc.exists()) {
@@ -84,11 +94,14 @@ public class TutorController {
 
     // Update existing profile (PATCH for partial updates)
     @PatchMapping("updateprofile/{uid}")
-    public ResponseEntity<String> updateTutorProfile(
-        @PathVariable String uid,
-        @RequestBody TutorModel tutorData
-    ) {
+    public ResponseEntity<String> updateTutorProfile(@PathVariable String uid,@RequestBody TutorModel tutorData,HttpServletRequest request) {
         try {
+            FirebaseToken decodedToken = (FirebaseToken) request.getAttribute("firebaseToken");
+
+            if (decodedToken == null || !decodedToken.getUid().equals(uid)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // user trying to access another user's data
+            }
+
             String result = tutorService.updateTutorProfile(uid, tutorData);
             return ResponseEntity.ok(result);
         } catch (IllegalArgumentException e) {
@@ -100,8 +113,14 @@ public class TutorController {
 
     // Delete existing profile
     @DeleteMapping("deleteprofile/{uid}")
-    public ResponseEntity<String> deleteTutorProfile(@PathVariable String uid) {
+    public ResponseEntity<String> deleteTutorProfile(@PathVariable String uid,HttpServletRequest request) {
         try {
+            FirebaseToken decodedToken = (FirebaseToken) request.getAttribute("firebaseToken");
+
+            if (decodedToken == null || !decodedToken.getUid().equals(uid)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // user trying to access another user's data
+            }
+
             tutorService.deleteTutorProfile(uid);
             return ResponseEntity.ok("Profile deleted successfully");
         } catch (FirebaseAuthException e) {
