@@ -133,7 +133,7 @@ public class TutorService {
             updates.put("experience", tutorData.getExperience());
         }
         if (tutorData.getPhoneNumber() != null) {
-            updates.put("experience", tutorData.getPhoneNumber());
+            updates.put("phoneNumber", tutorData.getPhoneNumber());
         }
         if (tutorData.getProfileImageUrl() != null) {
             updates.put("profileImage", tutorData.getProfileImageUrl());
