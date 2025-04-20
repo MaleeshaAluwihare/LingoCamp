@@ -20,7 +20,10 @@ const HomePage = () => {
       const fetchUserData = async () => {
         if(user) {
           try {
-            const response = await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`);
+            const token = await user.getIdToken();
+            const response = await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`,
+              { headers: { Authorization: `Bearer ${token}`}}
+            );
             setTutorData(response.data);
           }catch(error){
             console.error("Error fetching tutor data:", error);
@@ -36,7 +39,10 @@ const HomePage = () => {
       const checkTutorProfile = async () => {
         if(user && !isGuest) {
           try {
-            const response = await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`);
+            const token = await user.getIdToken();
+            const response = await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`,
+              { headers: { Authorization: `Bearer ${token}`}}
+            );
             setTutorProfileComplete(response.data?.profileComplete || false);
           } catch {
             setTutorProfileComplete(false);
@@ -91,7 +97,10 @@ const HomePage = () => {
       
       if (confirmation === "DELETE") {
         try {
-          await axios.delete(`http://localhost:8081/lingocamp/api/tutors/deleteprofile/${user.uid}`);
+          const token = await user.getIdToken();
+          await axios.delete(`http://localhost:8081/lingocamp/api/tutors/deleteprofile/${user.uid}`,
+            { headers: { Authorization: `Bearer ${token}`}}
+          );
           await auth.signOut();
           navigate('/tutorlogin');
         } catch (error) {

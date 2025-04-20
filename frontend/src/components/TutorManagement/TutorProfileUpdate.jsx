@@ -46,7 +46,10 @@ const TutorProfileUpdate = () => {
     const fetchProfileData = async () => {
       if(user) {
         try {
-          const response = await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`);
+          const token = await user.getIdToken();
+          const response = await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`,
+            {headers: {Authorization: `Bearer ${token}`}}
+          );
           console.log(response);
           const data = response.data;
           
@@ -101,9 +104,10 @@ const TutorProfileUpdate = () => {
         profileComplete: true
       };
 
-      await axios.patch(
-        `http://localhost:8081/lingocamp/api/tutors/updateprofile/${user.uid}`,
-        formData
+      const token = await user.getIdToken();
+      await axios.patch(`http://localhost:8081/lingocamp/api/tutors/updateprofile/${user.uid}`,
+        formData,
+        {headers: {Authorization: `Bearer ${token}`}}
       );
       navigate('/home');
     } catch (error) {
