@@ -1,5 +1,9 @@
 package com.skillshareplatform.lingocamp.controller.CourseManagement;
 
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.auth.FirebaseToken;
 import com.skillshareplatform.lingocamp.model.TutorManagement.CourseModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +14,8 @@ import com.skillshareplatform.lingocamp.service.CourseManagement.CourseService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -19,6 +25,9 @@ public class CourseController {
 
     @Autowired
     private CourseService courseService;
+
+    @Autowired
+    private Firestore firestore;
 
     @PostMapping("/create")
     public ResponseEntity<?> createCourse(
@@ -44,4 +53,37 @@ public class CourseController {
                     .body(Map.of("error", "Course creation failed: " + e.getMessage()));
         }
     }
+
+    @GetMapping("/mycourses")
+    public ResponseEntity<List<CourseModel>> getMyCourses(HttpServletRequest request) {
+        try {
+            // Get authenticated Firebase user
+            FirebaseToken decodedToken = (FirebaseToken) request.getAttribute("firebaseToken");
+
+            if (decodedToken == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            String tutorId = decodedToken.getUid();
+
+            // Query Firestore for courses with matching tutorId
+            ApiFuture<QuerySnapshot> future = firestore.collection("Courses")
+                    .whereEqualTo("tutorId", tutorId)
+                    .get();
+
+            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+            List<CourseModel> courses = new ArrayList<>();
+
+            for (QueryDocumentSnapshot doc : documents) {
+                CourseModel course = doc.toObject(CourseModel.class);
+                courses.add(course);
+            }
+
+            return ResponseEntity.ok(courses);
+
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 }

@@ -29,7 +29,7 @@ public class CourseService {
         course.setTutorId(tutorId);
         course.setCreatedAt(Timestamp.now());
         course.setUpdatedAt(Timestamp.now());
-        course.setStatus("DRAFT");
+        course.setStatus(course.getStatus());
 
         DocumentReference docRef = courseRepository.saveCourse(course);
         return Map.of(
