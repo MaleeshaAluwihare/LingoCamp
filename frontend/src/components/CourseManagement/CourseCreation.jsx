@@ -121,6 +121,7 @@ const CourseCreation = () => {
     setLoading(true);
     try {
       const token = await user.getIdToken(); 
+
       const courseData = {
         ...data,
         tutorId: user.uid,
@@ -132,12 +133,11 @@ const CourseCreation = () => {
         status: "DRAFT"
       };
 
-      await axios.post(`http://localhost:8081/lingocamp/api/courses/create`, courseData,{
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      await axios.post(`http://localhost:8081/lingocamp/api/courses/create`, courseData,
+        {headers: {Authorization: `Bearer ${token}`}});
+
       navigate("/courses");
+      
     } catch (error) {
       console.error("Course creation failed:", error);
     }
