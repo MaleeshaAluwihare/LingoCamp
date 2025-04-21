@@ -23,23 +23,23 @@ const CourseCreation = () => {
     type: "PDF",
     file: null
   });
-  const [description, setDescription] = useState("");
+  const [coureContent, setCourseContent] = useState("");
   const [materialContent, setMaterialContent] = useState("");
   const [coverImage, setCoverImage] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const { getRootProps, getInputProps } = useDropzone({
-    accept: 'image/*',
+    accept: {'image/*': ['.jpeg', '.jpg', '.png','.webp']},
     multiple: false,
     onDrop: files => handleCoverImageUpload(files[0])
   });
 
   const handleCoverImageUpload = async (file) => {
-    if (!file || !user){
+    if (!file || !user) {
       console.error("User not authenticated");
       return;
-    } 
-    
+    }
+
     const storageRef = ref(storage, `covers/${user.uid}/${uuidv4()}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
@@ -71,7 +71,7 @@ const CourseCreation = () => {
       ['clean']
     ],
   };
-  
+
   const formats = [
     'header',
     'bold', 'italic', 'underline', 'strike',
@@ -120,7 +120,7 @@ const CourseCreation = () => {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      const token = await user.getIdToken(); 
+      const token = await user.getIdToken();
 
       const courseData = {
         ...data,
@@ -128,16 +128,15 @@ const CourseCreation = () => {
         studyMaterials,
         price: parseFloat(data.price),
         durationWeeks: parseInt(data.durationWeeks),
-        description,
+        coureContent,
         coverImage,
-        status: "DRAFT"
       };
 
       await axios.post(`http://localhost:8081/lingocamp/api/courses/create`, courseData,
-        {headers: {Authorization: `Bearer ${token}`}});
+        { headers: { Authorization: `Bearer ${token}` } });
 
       navigate("/courses");
-      
+
     } catch (error) {
       console.error("Course creation failed:", error);
     }
@@ -150,14 +149,14 @@ const CourseCreation = () => {
 
       {/* Cover Image Upload */}
       <div className="mb-8">
-        <label className="block text-sm font-medium text-gray-700 mb-3">Course Cover Image</label>
+        <label className="block text-sm font-medium text-gray-700 mb-3">Image</label>
         <div
           {...getRootProps()}
           className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer
             ${coverImage ? 'border-green-100 bg-green-50' : 'border-gray-300 hover:border-blue-500'}`}
         >
           <input {...getInputProps()} />
-          
+
           {coverImage ? (
             <div className="relative group">
               <img src={coverImage} alt="Course cover" className="w-full h-48 object-cover rounded-lg" />
@@ -233,13 +232,15 @@ const CourseCreation = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
             <select
-              {...register("status")}
+              {...register("status", { required: "Status is required" })}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              defaultValue="DRAFT"
             >
-              <option value="DRAFT">Draft</option>
-              <option value="PUBLISHED">Published</option>
+              <option value="DRAFT">DRAFT</option>
+              <option value="PUBLISHED">PUBLISHED</option>
             </select>
+            {errors.status && (
+              <p className="text-red-500 text-sm mt-1">{errors.status.message}</p>
+            )}
           </div>
         </div>
 
@@ -247,14 +248,14 @@ const CourseCreation = () => {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-3">Course Content</label>
           <ReactQuill
-          theme="snow"
-          value={description}
-          onChange={setDescription}
-          modules={modules}
-          formats={formats}
-          className="h-64 mb-8 bg-white rounded-lg border-gray-300"
-          placeholder="Write your course description here..."
-        />
+            theme="snow"
+            value={coureContent}
+            onChange={setCourseContent}
+            modules={modules}
+            formats={formats}
+            className="h-64 mb-8 bg-white rounded-lg border-gray-300"
+            placeholder="Write your course Content here..."
+          />
         </div>
 
         {/* Study Materials Section */}
@@ -300,7 +301,7 @@ const CourseCreation = () => {
                   <label className="block mb-2">File</label>
                   <input
                     type="file"
-                    accept={newMaterial.type === "VIDEO" ? "video/*" : ".pdf,.doc,.docx"}
+                    accept={newMaterial.type === "VIDEO" ? "video/*" : ".pdf,application/pdf,.doc,.docx"}
                     onChange={(e) => setNewMaterial({ ...newMaterial, file: e.target.files[0] })}
                     className="w-full"
                   />
@@ -309,23 +310,23 @@ const CourseCreation = () => {
             </div>
 
             <button
-            type="button"
-            onClick={addStudyMaterial}
-            disabled={loading}
-            className="w-full py-3 px-6 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors flex items-center justify-center"
-          >
-            {loading ? (
-              <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
-                {/* spinner icon */}
-              </svg>
-            ) : (
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-              </svg>
-            )}
-            {loading ? "Adding..." : "Add Study Material"}
-          </button>
-        </div>
+              type="button"
+              onClick={addStudyMaterial}
+              disabled={loading}
+              className={`w-full py-3 px-6 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors flex items-center justify-center${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+            >
+              {loading ? (
+                <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+                  {/* spinner icon */}
+                </svg>
+              ) : (
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              )}
+              {loading ? "Adding..." : "Add Study Material"}
+            </button>
+          </div>
 
           {/* Materials List */}
           {studyMaterials.map((material, index) => (
