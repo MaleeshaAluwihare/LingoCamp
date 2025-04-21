@@ -104,6 +104,7 @@ public class TutorController {
 
             String result = tutorService.updateTutorProfile(uid, tutorData);
             return ResponseEntity.ok(result);
+
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (InterruptedException | ExecutionException e) {
@@ -123,6 +124,7 @@ public class TutorController {
 
             tutorService.deleteTutorProfile(uid);
             return ResponseEntity.ok("Profile deleted successfully");
+            
         } catch (FirebaseAuthException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not in authentication system");
         }catch (InterruptedException | ExecutionException e) {
