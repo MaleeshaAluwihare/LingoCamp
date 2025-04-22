@@ -61,7 +61,7 @@ const HomePage = () => {
           navigate('/tutorregistration');
         }
       } else if (user) {
-        navigate('/coursecreate');
+        navigate('/createcourse');
       } else {
         const confirm = window.confirm(
           'You need to be logged in to create courses. Go to login page now?'

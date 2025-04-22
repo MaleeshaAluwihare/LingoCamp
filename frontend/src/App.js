@@ -8,7 +8,7 @@ import HomePage from './components/Home';
 import TutorCompleteProfile from './components/TutorManagement/TutorProfileCompletion';
 import TutorProfileUpdate from './components/TutorManagement/TutorProfileUpdate';
 
-import CourseCreate from './components/CourseManagement/CourseCreation';
+import CreateCourse from './components/CourseManagement/CourseCreation';
 import CourseDisplay from './components/CourseManagement/CourseDisplay';
 
 import JobDashboard from './components/JobManagement/JobDashboard';
@@ -78,7 +78,7 @@ function App() {
         <Route path='/tutorregistration' element={<TutorRegistration/>}/>
         <Route path='/tutorcompleteprofile' element={<TutorCompleteProfile/>}/>
         <Route path='/tutorprofileupdate' element={<TutorProfileUpdate/>}/>
-        <Route path='/coursecreate' element={<CourseCreate/>}/>
+        <Route path='/createcourse' element={<CreateCourse/>}/>
         <Route path='/courses' element={<CourseDisplay/>}/>
         <Route path='/jobdashboard' element={<JobDashboard/>}/>
         <Route path='/job' element={<Job/>}/>
