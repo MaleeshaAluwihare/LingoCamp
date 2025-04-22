@@ -20,8 +20,14 @@ public class CourseRepository {
         return tutorSnapshot.exists();
     }
 
-    public DocumentReference saveCourse(CourseModel course) throws ExecutionException, InterruptedException {
-        ApiFuture<DocumentReference> future = firestore.collection("Courses").add(course);
-        return future.get();
+    public CourseModel saveCourse(CourseModel course) throws ExecutionException, InterruptedException {
+        DocumentReference docRef = firestore.collection("Courses").document();
+        
+        course.setCourseId(docRef.getId());
+        
+        ApiFuture<WriteResult> future = docRef.set(course);
+        future.get(); 
+        
+        return course;
     }
 }

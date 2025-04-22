@@ -83,7 +83,7 @@ const TutorRegistration = () => {
       }
       
       const formData = { ...data, uid: user.uid, profileImageUrl, specialization: specializations, socialLinks };
-      console.log(formData);
+    
       const response = await axios.post(`http://localhost:8081/lingocamp/api/tutors/register`, formData);
       setMessage(`Registration successful! Tutor ID: ${response.data}`);
       navigate("/home");

@@ -9,6 +9,7 @@ import com.skillshareplatform.lingocamp.model.TutorManagement.CourseModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 import com.skillshareplatform.lingocamp.service.CourseManagement.CourseService;
 
@@ -17,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -83,6 +85,31 @@ public class CourseController {
 
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+   @DeleteMapping("deletecourse/{courseId}")
+    public ResponseEntity<?> deleteCourse(@PathVariable String courseId, HttpServletRequest request) {
+        try {
+            FirebaseToken decodedToken = (FirebaseToken) request.getAttribute("firebaseToken");
+
+            if (decodedToken == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            String tutorId = decodedToken.getUid();
+
+            courseService.deleteCourseByTutor(courseId, tutorId);
+            return ResponseEntity.ok(Map.of("message", "Course deleted successfully"));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Unexpected error"));
         }
     }
 

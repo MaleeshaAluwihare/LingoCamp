@@ -10,6 +10,7 @@ import lombok.Setter;
 @Setter
 public class CourseModel {
 
+    private String courseId;  
     private String tutorId;           // Firebase UID of creator
     private String title;
     private String description;
@@ -20,7 +21,7 @@ public class CourseModel {
     private Timestamp createdAt;
     private Timestamp updatedAt;
     private String status;           // DRAFT, PUBLISHED, ARCHIVED
-    private List<String> categories; // Optional: ["English", "Sinhala", etc.]
+    private String categories;      // ["English", "Sinhala", etc.]
 
     @Getter
     @Setter

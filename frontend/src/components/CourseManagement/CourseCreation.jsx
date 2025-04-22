@@ -13,7 +13,7 @@ import MDEditor from '@uiw/react-md-editor';
 import { useDropzone } from 'react-dropzone';
 
 const CourseCreation = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm({defaultValues: {categories: ""}});
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -23,7 +23,7 @@ const CourseCreation = () => {
     type: "PDF",
     file: null
   });
-  const [coureContent, setCourseContent] = useState("");
+  const [description, setDescription] = useState("");
   const [materialContent, setMaterialContent] = useState("");
   const [coverImage, setCoverImage] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -128,7 +128,7 @@ const CourseCreation = () => {
         studyMaterials,
         price: parseFloat(data.price),
         durationWeeks: parseInt(data.durationWeeks),
-        coureContent,
+        description,
         coverImage,
       };
 
@@ -149,7 +149,7 @@ const CourseCreation = () => {
 
       {/* Cover Image Upload */}
       <div className="mb-8">
-        <label className="block text-sm font-medium text-gray-700 mb-3">Image</label>
+        <label className="block text-sm font-medium text-gray-700 mb-3">Course Cover Image</label>
         <div
           {...getRootProps()}
           className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer
@@ -244,18 +244,42 @@ const CourseCreation = () => {
           </div>
         </div>
 
-        {/* Course Description */}
-        <div>
+       {/* Course Content */}
+        <div className="mb-8">  
           <label className="block text-sm font-medium text-gray-700 mb-3">Course Content</label>
           <ReactQuill
             theme="snow"
-            value={coureContent}
-            onChange={setCourseContent}
+            value={description}
+            onChange={setDescription}
             modules={modules}
             formats={formats}
-            className="h-64 mb-8 bg-white rounded-lg border-gray-300"
+            className="h-64 mb-4 bg-white rounded-lg border-gray-300"  
             placeholder="Write your course Content here..."
           />
+        </div>
+
+        {/* Course Category */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2 mt-24">Language</label>
+          <input
+            list="languageCategories"
+            {...register("categories", {
+              required: "Language category is required",
+              validate: value => value.trim().length > 0 || "Category cannot be empty"
+            })}
+            placeholder="Select or enter a language"
+            className="block w-full mt-1 border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <datalist id="languageCategories">
+            <option value="English" />
+            <option value="Sinhala" />
+            <option value="Mandarin Chinese" />
+            <option value="Spanish" />
+            <option value="Hindi" />
+          </datalist>
+          {errors.categories && (
+            <p className="mt-1 text-sm text-red-600">{errors.categories.message}</p>
+          )}
         </div>
 
         {/* Study Materials Section */}
