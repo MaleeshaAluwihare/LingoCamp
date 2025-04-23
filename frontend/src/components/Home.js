@@ -52,19 +52,19 @@ const HomePage = () => {
       checkTutorProfile();
     }, [user, isGuest]);
 
-    const handleCreateCourseClick = () => {
+    const handleDashboardNavigation = () => {
       if (isGuest) {
         const confirm = window.confirm(
-          'You need a tutor account to create courses. Would you like to register now?'
+          'You need a tutor account to navigate to dashboard. Would you like to register now?'
         );
         if (confirm) {
           navigate('/tutorregistration');
         }
       } else if (user) {
-        navigate('/createcourse');
+        navigate('/coursedashboard');
       } else {
         const confirm = window.confirm(
-          'You need to be logged in to create courses. Go to login page now?'
+          'You need to be logged in to navigate to dashboard. Go to login page now?'
         );
         if (confirm) {
           navigate('/tutorlogin');
@@ -243,24 +243,19 @@ const HomePage = () => {
               Immerse yourself in real conversations with native speakers from around the world.
             </p>
             <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
-              <button className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+              <button
+                onClick={handleDashboardNavigation}
+                className={`${
+                  isGuest || !user ? 'bg-gray-400 hover:bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'
+                } text-white p-3 rounded-lg transition-colors`}
+                title={isGuest ? "Guest users cannot started" : !user ? "Login to navigate" : ""}
+              >
                 Get Started
               </button>
             </div>
           </div>
         </div>
       </main>
-      <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
-      <button 
-        onClick={handleCreateCourseClick}
-        className={`${
-          isGuest || !user ? 'bg-gray-400 hover:bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'
-        } text-white p-3 rounded-lg transition-colors`}
-        title={isGuest ? "Guest users cannot create courses" : !user ? "Login to create courses" : ""}
-      >
-        Create New Course
-      </button>
-      </div>
 
       {/* Features Section */}
       <section className="py-12 bg-white" id="features">
