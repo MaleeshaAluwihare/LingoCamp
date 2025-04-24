@@ -1,29 +1,41 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/react';
-import { FiGlobe, FiUsers, FiSmartphone, FiChevronDown, FiUser, FiSettings, FiLogOut, FiEdit, FiTrash2 } from 'react-icons/fi';
-import { Link } from "react-router-dom";
+import { FiGlobe, FiUsers, FiSmartphone, FiChevronDown, FiUser, FiSettings, FiLogOut, FiEdit, FiTrash2 } from 'react-icons/fi';import { Link } from "react-router-dom";
 import { auth } from '../firebaseConfig';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
+import { fetchAllCompanyPosts } from "../services/apiService";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
 
 const HomePage = () => {
     const [user] = useAuthState(auth);
     const [tutorData, setTutorData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isGuest, setIsGuest] = useState(false);
-    const [tutorProfileComplete, setTutorProfileComplete] = useState(false);
     const navigate = useNavigate();
+
+    const [allPosts, setAllPosts] = useState([]);
+    const [activeTab, setActiveTab] = useState("all");
+
+
+    useEffect(() => {
+      const fetchPosts = async () => {
+        const posts = await fetchAllCompanyPosts();
+        console.log("Fetched posts:", posts); // 👈 Check console log
+        setAllPosts(posts);
+      };
+      fetchPosts();
+    }, []);
+    
 
     useEffect(() => {
       const fetchUserData = async () => {
         if(user) {
           try {
-            const token = await user.getIdToken();
-            const response = await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`,
-              { headers: { Authorization: `Bearer ${token}`}}
-            );
+            const response = await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`);
             setTutorData(response.data);
           }catch(error){
             console.error("Error fetching tutor data:", error);
@@ -34,43 +46,6 @@ const HomePage = () => {
       };
       fetchUserData();
     },[user]);
-
-    useEffect(() => {
-      const checkTutorProfile = async () => {
-        if(user && !isGuest) {
-          try {
-            const token = await user.getIdToken();
-            const response = await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`,
-              { headers: { Authorization: `Bearer ${token}`}}
-            );
-            setTutorProfileComplete(response.data?.profileComplete || false);
-          } catch {
-            setTutorProfileComplete(false);
-          }
-        }
-      };
-      checkTutorProfile();
-    }, [user, isGuest]);
-
-    const handleDashboardNavigation = () => {
-      if (isGuest) {
-        const confirm = window.confirm(
-          'You need a tutor account to navigate to dashboard. Would you like to register now?'
-        );
-        if (confirm) {
-          navigate('/tutorregistration');
-        }
-      } else if (user) {
-        navigate('/coursedashboard');
-      } else {
-        const confirm = window.confirm(
-          'You need to be logged in to navigate to dashboard. Go to login page now?'
-        );
-        if (confirm) {
-          navigate('/tutorlogin');
-        }
-      }
-    };
 
     const getDisplayName = () => {
       if(tutorData?.firstName) return tutorData.firstName;
@@ -97,12 +72,9 @@ const HomePage = () => {
       
       if (confirmation === "DELETE") {
         try {
-          const token = await user.getIdToken();
-          await axios.delete(`http://localhost:8081/lingocamp/api/tutors/deleteprofile/${user.uid}`,
-            { headers: { Authorization: `Bearer ${token}`}}
-          );
+          await axios.delete(`http://localhost:8081/lingocamp/api/tutors/deleteprofile/${user.uid}`);
           await auth.signOut();
-          navigate('/tutorlogin');
+          navigate('/home');
         } catch (error) {
           console.error('Deletion failed:', error);
           alert('Profile deletion failed. Please try again.');
@@ -114,13 +86,11 @@ const HomePage = () => {
 
     useEffect(() => {
       const guestStatus = localStorage.getItem('isGuest');
-      if (user && guestStatus) {
-        localStorage.removeItem('isGuest');
-        setIsGuest(false);
-      } else {
-        setIsGuest(!!guestStatus);
+      if (!user && !guestStatus) {
+          navigate('/tutorlogin');
       }
-    }, [user, navigate]);
+      setIsGuest(!!guestStatus);
+  }, [user, navigate]);
 
 
     return (
@@ -243,13 +213,7 @@ const HomePage = () => {
               Immerse yourself in real conversations with native speakers from around the world.
             </p>
             <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
-              <button
-                onClick={handleDashboardNavigation}
-                className={`${
-                  isGuest || !user ? 'bg-gray-400 hover:bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'
-                } text-white p-3 rounded-lg transition-colors`}
-                title={isGuest ? "Guest users cannot started" : !user ? "Login to navigate" : ""}
-              >
+              <button className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
                 Get Started
               </button>
             </div>
@@ -285,6 +249,72 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+
+      <div className="max-w-4xl mx-auto my-8">
+      <div className="flex justify-center mb-4">
+        <button
+          onClick={() => setActiveTab("all")}
+          className={`px-4 py-2 rounded ${activeTab === "all" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
+        >
+          All Posts
+        </button>
+      </div>
+
+      {/* 🔥 Your Component Starts Here */}
+      {activeTab === "all" && (
+        <div className="space-y-6 mt-6">
+          {allPosts.length === 0 ? (
+            <p className="text-center text-gray-500">No posts available.</p>
+          ) : (
+            allPosts.map((post, index) => (
+              <div key={index} className="bg-white shadow rounded p-4">
+                <div className="flex items-center mb-2">
+                  {post.companyProfileImage ? (
+                    <img src={post.companyProfileImage} className="w-10 h-10 rounded-full mr-3" alt="profile" />
+                  ) : (
+                    <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center mr-3">
+                      <span className="text-blue-600 font-bold">{post.companyEmail?.charAt(0)}</span>
+                    </div>
+                  )}
+                  <div>
+                    <p className="font-semibold">{post.companyEmail}</p>
+                    <p className="text-xs text-gray-500">
+                      {post.createdAt?.seconds
+                        ? new Date(post.createdAt.seconds * 1000).toLocaleString()
+                        : "Just now"}
+                    </p>
+                  </div>
+                </div>
+                <p className="mb-2">{post.description}</p>
+                {post.mediaUrls?.length > 0 && (
+                  <Swiper spaceBetween={10} slidesPerView={1}>
+                    {post.mediaUrls.map((url, i) => {
+                       const cleanUrl = url.split("?")[0]; // Remove query params
+                       const isVideo =
+                         cleanUrl.toLowerCase().endsWith(".mp4") ||
+                         cleanUrl.toLowerCase().endsWith(".webm") ||
+                         cleanUrl.toLowerCase().endsWith(".ogg");
+
+                       return (
+                      <SwiperSlide key={i}>
+                        {isVideo ? (
+                          <video controls className="w-full max-h-96 rounded">
+                            <source src={url} type="video/mp4" />
+                          </video>
+                        ) : (
+                          <img src={url} alt={`media-${i}`} className="w-full max-h-96 object-cover rounded" />
+                        )}
+                      </SwiperSlide>
+                     );
+                    })}
+                  </Swiper>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </div>
 
       {/* Footer */}
       <footer className="bg-gray-800 text-white mt-12">
