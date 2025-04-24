@@ -394,7 +394,7 @@ const CompanyDashboard = () => {
                   className="py-1 px-4 border border-blue-600 rounded-full text-blue-600 font-medium hover:bg-blue-50"
                   onClick={() => navigate("/joblist")}
                 >
-                  <span>Applied Jobs</span>
+                  <span>Previously Applied Jobs</span>
                 </button>
 
               </div>
