@@ -308,12 +308,7 @@ const CompanyDashboard = () => {
             >
               Jobs
             </span>
-            <span
-              className="cursor-pointer font-semibold text-blue-600 pb-1"
-              onClick={() => navigate("/message")}
-            >
-              Messaging
-            </span>
+
             <div className="relative group">
               <button className="text-sm font-medium text-blue-700 focus:outline-none">
                 {userEmail}
@@ -394,21 +389,14 @@ const CompanyDashboard = () => {
               </div>
 
               <div className="flex space-x-2">
-                <button className="py-1 px-4 border border-blue-600 rounded-full text-blue-600 font-medium hover:bg-blue-50">
-                  <span>Follow</span>
-                </button>
+
                 <button
                   className="py-1 px-4 border border-blue-600 rounded-full text-blue-600 font-medium hover:bg-blue-50"
-                  onClick={() => navigate("/message")}
+                  onClick={() => navigate("/joblist")}
                 >
-                  <span>Message</span>
+                  <span>Applied Jobs</span>
                 </button>
-                <button
-                  className="py-1 px-4 bg-blue-600 rounded-full text-white font-medium hover:bg-blue-700"
-                  onClick={() => setShowPasswordModal(true)}
-                >
-                  <span>Post a job</span>
-                </button>
+
               </div>
 
               {/* Password Modal */}
@@ -531,22 +519,22 @@ const CompanyDashboard = () => {
             </div>
 
             <div className="bg-white rounded-lg shadow p-4">
-              <h2 className="font-bold mb-2">Following People</h2>
+              {/* <h2 className="font-bold mb-2">Following People</h2> */}
               <div className="space-y-4 mt-3">
                 {followingPeople.map((person) => (
                   <div key={person.id} className="flex items-center">
-                    <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                    {/* <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3">
                       <span className="font-bold text-sm">
                         {person.name.charAt(0)}
                       </span>
-                    </div>
-                    <div>
+                    </div> */}
+                    {/* <div>
                       <p className="font-medium">{person.name}</p>
                       <p className="text-xs text-gray-500">{person.position}</p>
                       <p className="text-xs text-gray-500">
                         {person.followers} followers
                       </p>
-                    </div>
+                    </div> */}
                   </div>
                 ))}
               </div>
@@ -738,8 +726,8 @@ const CompanyDashboard = () => {
                       <p className="text-xs text-gray-500">
                         {post.createdAt?.seconds
                           ? new Date(
-                              post.createdAt.seconds * 1000
-                            ).toLocaleString()
+                            post.createdAt.seconds * 1000
+                          ).toLocaleString()
                           : "Just now"}{" "}
                         · <span className="text-gray-700">🌐</span>
                       </p>
@@ -794,6 +782,24 @@ const CompanyDashboard = () => {
                       </Swiper>
                     )}
                   </div>
+                  {/* Comment Area */}
+                  <div className="mt-4 border-t pt-3">
+                    <h4 className="font-semibold text-sm mb-2">Comments</h4>
+
+                    {post.comments?.length > 0 ? (
+                      <div className="space-y-2">
+                        {post.comments.map((comment, idx) => (
+                          <div key={idx} className="bg-gray-100 p-2 rounded text-sm">
+                            <p className="font-medium text-gray-800">{comment.userEmail || "Anonymous"}</p>
+                            <p className="text-gray-700">{comment.text}</p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500">No comments yet.</p>
+                    )}
+                  </div>
+
                 </div>
               ))}
             </div>
@@ -837,6 +843,8 @@ const CompanyDashboard = () => {
                       );
                     })}
                   </div>
+
+
 
                   {/* New Media Upload */}
                   <input
