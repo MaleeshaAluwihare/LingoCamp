@@ -277,7 +277,7 @@ const CompanyDashboard = () => {
       console.error("Failed to delete post", error);
       alert("Error deleting post");
     }
-  }
+  };
 
   return (
     <div className="bg-gray-100 min-h-screen">
@@ -308,7 +308,12 @@ const CompanyDashboard = () => {
             >
               Jobs
             </span>
-           
+            <span
+              className="cursor-pointer font-semibold text-blue-600 pb-1"
+              onClick={() => navigate("/message")}
+            >
+              Messaging
+            </span>
             <div className="relative group">
               <button className="text-sm font-medium text-blue-700 focus:outline-none">
                 {userEmail}
@@ -389,14 +394,21 @@ const CompanyDashboard = () => {
               </div>
 
               <div className="flex space-x-2">
-               
+                <button className="py-1 px-4 border border-blue-600 rounded-full text-blue-600 font-medium hover:bg-blue-50">
+                  <span>Follow</span>
+                </button>
                 <button
                   className="py-1 px-4 border border-blue-600 rounded-full text-blue-600 font-medium hover:bg-blue-50"
-                  onClick={() => navigate("/joblist")}
+                  onClick={() => navigate("/message")}
                 >
-                  <span>View Jobs</span>
+                  <span>Message</span>
                 </button>
-               
+                <button
+                  className="py-1 px-4 bg-blue-600 rounded-full text-white font-medium hover:bg-blue-700"
+                  onClick={() => setShowPasswordModal(true)}
+                >
+                  <span>Post a job</span>
+                </button>
               </div>
 
               {/* Password Modal */}
