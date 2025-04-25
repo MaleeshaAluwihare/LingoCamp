@@ -32,9 +32,7 @@ public class CourseController {
     private Firestore firestore;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createCourse(
-        @RequestBody CourseModel course,
-        HttpServletRequest request
+    public ResponseEntity<?> createCourse(@RequestBody CourseModel course,HttpServletRequest request
     ) {
         try {
             FirebaseToken decodedToken = (FirebaseToken) request.getAttribute("firebaseToken");
@@ -88,6 +86,30 @@ public class CourseController {
         }
     }
 
+    @GetMapping("course/{courseId}")
+    public ResponseEntity<?> getCourseById(@PathVariable String courseId, HttpServletRequest request) {
+        try {
+            FirebaseToken decodedToken = (FirebaseToken) request.getAttribute("firebaseToken");
+
+            if (decodedToken == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Unauthorized"));
+            }
+
+            String tutorId = decodedToken.getUid();
+
+            CourseModel course = courseService.getCourseById(courseId, tutorId);
+            return ResponseEntity.ok(course);
+
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Unexpected error"));
+        }
+    }
+
+
    @DeleteMapping("deletecourse/{courseId}")
     public ResponseEntity<?> deleteCourse(@PathVariable String courseId, HttpServletRequest request) {
         try {
@@ -113,4 +135,28 @@ public class CourseController {
         }
     }
 
+    @PutMapping("/update/{courseId}")
+    public ResponseEntity<?> updateCourse(@PathVariable String courseId,@RequestBody CourseModel updatedCourse,HttpServletRequest request) {
+        try {
+            FirebaseToken decodedToken = (FirebaseToken) request.getAttribute("firebaseToken");
+
+            if (decodedToken == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            String tutorId = decodedToken.getUid();
+
+            courseService.updateCourse(courseId, updatedCourse, tutorId);
+            return ResponseEntity.ok(Map.of("message", "Course updated successfully"));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Unexpected error occurred"));
+        }
+    }
 }

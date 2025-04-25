@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import axios from 'axios';
@@ -50,7 +50,6 @@ const TutorProfileUpdate = () => {
           const response = await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`,
             {headers: {Authorization: `Bearer ${token}`}}
           );
-          console.log(response);
           const data = response.data;
           
           // Set form values with existing data

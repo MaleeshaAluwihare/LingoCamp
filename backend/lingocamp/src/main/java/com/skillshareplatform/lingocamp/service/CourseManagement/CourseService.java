@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.skillshareplatform.lingocamp.model.TutorManagement.CourseModel;
 import com.skillshareplatform.lingocamp.repository.CourseManagement.CourseRepository;
@@ -72,4 +73,56 @@ public class CourseService {
         }
     }
 
+    public Map<String, Object> updateCourse(String courseId, CourseModel updatedCourse, String tutorId)
+    throws ExecutionException, InterruptedException {
+
+        DocumentReference docRef = firestore.collection("Courses").document(courseId);
+        DocumentSnapshot snapshot = docRef.get().get();
+
+        if (!snapshot.exists()) {
+            throw new NoSuchElementException("Course not found");
+        }
+
+        String courseTutorId = snapshot.getString("tutorId");
+        
+        if (!tutorId.equals(courseTutorId)) {
+            throw new AccessDeniedException("You are not authorized to update this course");
+        }
+
+        if (updatedCourse.getTitle() == null || updatedCourse.getTitle().isBlank()) {
+            throw new IllegalArgumentException("Course title is required");
+        }
+
+        updatedCourse.setCourseId(courseId);        
+        updatedCourse.setTutorId(tutorId);          
+        updatedCourse.setUpdatedAt(Timestamp.now()); 
+        updatedCourse.setCreatedAt(snapshot.getTimestamp("createdAt"));
+
+        docRef.set(updatedCourse).get();
+
+        return Map.of(
+            "message", "Course updated successfully",
+            "courseId", courseId,
+            "updatedCourse", updatedCourse
+        );
+    }
+
+
+    public CourseModel getCourseById(String courseId, String tutorId)
+        throws ExecutionException, InterruptedException, AccessDeniedException {
+
+        DocumentReference docRef = firestore.collection("Courses").document(courseId);
+        DocumentSnapshot snapshot = docRef.get().get();
+
+        if (!snapshot.exists()) {
+            throw new NoSuchElementException("Course not found");
+        }
+
+        String courseTutorId = snapshot.getString("tutorId");
+        if (!tutorId.equals(courseTutorId)) {
+            throw new AccessDeniedException("You are not authorized to access this course");
+        }
+
+        return snapshot.toObject(CourseModel.class);
+    }
 }
