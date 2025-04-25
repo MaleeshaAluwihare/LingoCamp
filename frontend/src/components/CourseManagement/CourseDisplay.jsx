@@ -5,6 +5,7 @@ import { auth } from '../../firebaseConfig';
 import { Link } from 'react-router-dom';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import { FiFilter,FiSliders,FiBook,FiFolder,FiInfo } from 'react-icons/fi';
 
 const CourseDisplay = () => {
   const [courses, setCourses] = useState([]);
@@ -98,33 +99,67 @@ const CourseDisplay = () => {
       </div>
 
       {/* Filters Section */}
-      <div className="mb-8 flex flex-col sm:flex-row gap-4 bg-gray-50 p-4 rounded-lg">
-        <div className="flex flex-col w-full sm:w-1/3">
-          <label className="text-sm font-medium text-gray-700 mb-1">Status</label>
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            className="rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-          >
-            <option value="all">All Statuses</option>
-            <option value="DRAFT">Draft</option>
-            <option value="PUBLISHED">Published</option>
-          </select>
+      <div className="mb-8 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <h3 className="text-lg font-semibold text-gray-700 mb-6 flex items-center gap-2">
+          <FiFilter className="w-5 h-5 text-green-600" />
+          Filter Courses
+        </h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Status Filter */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              <FiSliders className="w-4 h-4 text-green-600" />
+              <span>Course Status</span>
+            </div>
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all cursor-pointer appearance-none"
+            >
+              <option value="all" className="text-gray-400">All Statuses</option>
+              <option value="DRAFT" className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-orange-400"></span>
+                Draft
+              </option>
+              <option value="PUBLISHED" className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-green-400"></span>
+                Published
+              </option>
+            </select>
+          </div>
+
+          {/* Category Filter */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              <FiBook className="w-4 h-4 text-green-600" />
+              <span>Course Category</span>
+            </div>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all cursor-pointer appearance-none"
+            >
+              <option value="all" className="text-gray-400">All Categories</option>
+              {uniqueCategories.map((category, index) => (
+                <option 
+                  key={index} 
+                  value={category}
+                  className="flex items-center gap-2"
+                >
+                  <FiFolder className="w-4 h-4 text-gray-400" />
+                  {category}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        <div className="flex flex-col w-full sm:w-1/3">
-          <label className="text-sm font-medium text-gray-700 mb-1">Category</label>
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-          >
-            <option value="all">All Categories</option>
-            {uniqueCategories.map((category, index) => (
-              <option key={index} value={category}>{category}</option>
-            ))}
-          </select>
-        </div>
+        {/* Helper Text */}
+        <p className="mt-4 text-sm text-gray-500 flex items-center gap-2">
+          <FiInfo className="w-4 h-4 text-green-600" />
+          Select filters to narrow down your course list
+        </p>
       </div>
 
       {/* Courses Grid */}
