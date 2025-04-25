@@ -32,9 +32,7 @@ public class CourseController {
     private Firestore firestore;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createCourse(
-        @RequestBody CourseModel course,
-        HttpServletRequest request
+    public ResponseEntity<?> createCourse(@RequestBody CourseModel course,HttpServletRequest request
     ) {
         try {
             FirebaseToken decodedToken = (FirebaseToken) request.getAttribute("firebaseToken");
@@ -138,10 +136,7 @@ public class CourseController {
     }
 
     @PutMapping("/update/{courseId}")
-    public ResponseEntity<?> updateCourse(
-            @PathVariable String courseId,
-            @RequestBody CourseModel updatedCourse,
-            HttpServletRequest request) {
+    public ResponseEntity<?> updateCourse(@PathVariable String courseId,@RequestBody CourseModel updatedCourse,HttpServletRequest request) {
         try {
             FirebaseToken decodedToken = (FirebaseToken) request.getAttribute("firebaseToken");
 
@@ -150,8 +145,8 @@ public class CourseController {
             }
 
             String tutorId = decodedToken.getUid();
-            courseService.updateCourse(courseId, updatedCourse, tutorId);
 
+            courseService.updateCourse(courseId, updatedCourse, tutorId);
             return ResponseEntity.ok(Map.of("message", "Course updated successfully"));
 
         } catch (IllegalArgumentException e) {
@@ -164,6 +159,4 @@ public class CourseController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Unexpected error occurred"));
         }
     }
-
-
 }

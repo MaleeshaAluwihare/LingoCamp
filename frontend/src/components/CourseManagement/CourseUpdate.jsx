@@ -7,11 +7,12 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, storage } from '../../firebaseConfig';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from "uuid";
-import { FiUploadCloud, FiX, FiPlus, FiLink, FiUser, FiBriefcase, FiAward, FiTrash } from 'react-icons/fi';
+import ReactQuill from 'react-quill-new';
+import { FiUploadCloud, FiPlus, FiTrash,FiX,FiAward,FiBriefcase,FiBookOpen,FiLink,FiLoader } from 'react-icons/fi';
 
 const CourseUpdate = () => {
     const { courseId } = useParams();
-    const { register, handleSubmit, control, setValue, formState: { errors } } = useForm();
+    const { register, handleSubmit, control, setValue, watch, formState: { errors } } = useForm();
     const [user] = useAuthState(auth);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
@@ -19,6 +20,8 @@ const CourseUpdate = () => {
     const [previewImage, setPreviewImage] = useState('');
     const [existingCoverImage, setExistingCoverImage] = useState('');
     const [uploadProgress, setUploadProgress] = useState(0);
+    const description = watch('description');
+
 
     const { fields, append, remove } = useFieldArray({
         control,
@@ -40,8 +43,6 @@ const CourseUpdate = () => {
                     Object.keys(data).forEach(key => {
                         if (key === 'studyMaterials') {
                             setValue('studyMaterials', data.studyMaterials);
-                        } else if (key === 'categories') {
-                            setValue('categories', data.categories.join(', '));
                         } else {
                             setValue(key, data[key]);
                         }
@@ -97,23 +98,23 @@ const CourseUpdate = () => {
     };
 
     const onSubmit = async (data) => {
+        setLoading(true);
         try {
-            setLoading(true);
-            const token = await user.getIdToken();
+            const { createdAt, updatedAt, ...filteredData } = data;
+            
             const payload = {
-                ...data,
-                categories: data.categories.split(',').map(c => c.trim()),
-                durationWeeks: Number(data.durationWeeks),
-                price: Number(data.price)
+                ...filteredData,
+                durationWeeks: Number(filteredData.durationWeeks),
+                price: Number(filteredData.price)
             };
-
-            await axios.put(
-                `http://localhost:8081/lingocamp/api/courses/course/${courseId}`,
+            const token = await user.getIdToken();
+            
+            await axios.put(`http://localhost:8081/lingocamp/api/courses/update/${courseId}`,
                 payload,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            
-            navigate(`/courses/${courseId}`);
+
+            navigate(`/mycourses`);
         } catch (error) {
             console.error('Update failed:', error);
         } finally {
@@ -121,187 +122,284 @@ const CourseUpdate = () => {
         }
     };
 
+    const modules = {
+        toolbar: [
+          [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+          ['bold', 'italic', 'underline', 'strike'],
+          [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+          [{ 'script': 'sub' }, { 'script': 'super' }],
+          [{ 'indent': '-1' }, { 'indent': '+1' }],
+          [{ 'direction': 'rtl' }],
+          [{ 'color': [] }, { 'background': [] }],
+          [{ 'font': [] }],
+          [{ 'align': [] }],
+          ['link', 'image', 'video'],
+          ['clean']
+        ],
+      };
+    
+      const formats = [
+        'header',
+        'bold', 'italic', 'underline', 'strike',
+        'list', 'script', 'indent',
+        'direction', 'color', 'font', 'background',
+        'align', 'link', 'image', 'video'
+      ];
+
+    const Label = ({ children }) => (
+        <label className="block text-sm font-medium text-gray-700 mb-2">{children}</label>
+    );
+    
+    const Input = ({ error, ...props }) => (
+        <div>
+            <input
+                className={`w-full px-4 py-2 rounded-lg border ${
+                    error ? 'border-red-500' : 'border-gray-300'
+                } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                {...props}
+            />
+            {error && <p className="text-red-500 text-sm mt-1">{error.message}</p>}
+        </div>
+    );
+    
+    const FileUploadInput = ({ onFileUpload, acceptedTypes }) => (
+        <div className="flex items-center gap-4">
+            <input
+                type="file"
+                accept={acceptedTypes}
+                onChange={(e) => onFileUpload(e.target.files[0])}
+                className="hidden"
+                id="fileUpload"
+            />
+            <label
+                htmlFor="fileUpload"
+                className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 cursor-pointer"
+            >
+                <FiUploadCloud />
+                Choose File
+            </label>
+            <span className="text-sm text-gray-500">Max file size: 50MB</span>
+        </div>
+    );
+    
+    
     return (
-        <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold mb-6 text-center">Update Course</h2>
-            
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                {/* Cover Image Upload */}
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                            const file = e.target.files[0];
-                            setCoverImage(file);
-                            setPreviewImage(URL.createObjectURL(file));
-                            handleCoverImageUpload(file);
-                        }}
-                        className="hidden"
-                        id="coverUpload"
-                    />
-                    <label htmlFor="coverUpload" className="cursor-pointer">
-                        <FiUploadCloud className="w-12 h-12 mx-auto text-gray-400" />
-                        <p className="mt-2 text-gray-600">
-                            {previewImage || existingCoverImage ? 'Change Cover Image' : 'Upload Cover Image'}
-                        </p>
-                        {(previewImage || existingCoverImage) && (
-                            <img
-                                src={previewImage || existingCoverImage}
-                                alt="Cover preview"
-                                className="mt-4 mx-auto h-48 object-cover rounded-lg"
+            <div className="max-w-5xl mx-auto p-8 bg-gray-50 min-h-screen">
+                <div className="flex items-center justify-between mb-8">
+                    <h2 className="text-3xl font-bold text-gray-800">Edit Course</h2>
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="flex items-center text-gray-600 hover:text-gray-800"
+                    >
+                        <FiX className="mr-1" /> Cancel
+                    </button>
+                </div>
+    
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+                    {/* Cover Image Section */}
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                            <FiAward className="mr-2 text-blue-600" />
+                            Course Cover Image
+                        </h3>
+                        <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:border-blue-200 transition-colors">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    setCoverImage(file);
+                                    setPreviewImage(URL.createObjectURL(file));
+                                    handleCoverImageUpload(file);
+                                }}
+                                className="hidden"
+                                id="coverUpload"
                             />
-                        )}
-                        {uploadProgress > 0 && (
-                            <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
-                                <div
-                                    className="bg-blue-600 h-2.5 rounded-full"
-                                    style={{ width: `${uploadProgress}%` }}
+                            <label htmlFor="coverUpload" className="cursor-pointer">
+                                <div className="space-y-4">
+                                    <FiUploadCloud className="w-12 h-12 mx-auto text-gray-400" />
+                                    <p className="text-gray-600 font-medium">
+                                        {previewImage || existingCoverImage 
+                                            ? 'Click to change cover image'
+                                            : 'Drag & drop or click to upload'}
+                                    </p>
+                                    <p className="text-sm text-gray-500">
+                                        Recommended size: 1200x600 pixels
+                                    </p>
+                                    {(previewImage || existingCoverImage) && (
+                                        <img
+                                            src={previewImage || existingCoverImage}
+                                            alt="Cover preview"
+                                            className="mt-4 mx-auto h-48 object-cover rounded-lg shadow-sm"
+                                        />
+                                    )}
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+    
+                    {/* Basic Information Section */}
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 className="text-lg font-semibold text-gray-700 mb-6 flex items-center">
+                            <FiBriefcase className="mr-2 text-blue-600" />
+                            Basic Information
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <Label>Course Title</Label>
+                                <Input
+                                    {...register('title', { required: 'Title is required' })}
+                                    error={errors.title}
                                 />
                             </div>
-                        )}
-                    </label>
-                </div>
-
-                {/* Basic Information */}
-                <div className="grid grid-cols-1 gap-6">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Course Title</label>
-                        <input
-                            {...register('title', { required: 'Title is required' })}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        />
-                        {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Description</label>
-                        <textarea
-                            {...register('description', { required: 'Description is required' })}
-                            rows={4}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        />
-                        {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Price ($)</label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                {...register('price', { required: 'Price is required', min: 0 })}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                            />
-                            {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Duration (Weeks)</label>
-                            <input
-                                type="number"
-                                {...register('durationWeeks', { required: 'Duration is required', min: 1 })}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                            />
-                            {errors.durationWeeks && (
-                                <p className="text-red-500 text-sm mt-1">{errors.durationWeeks.message}</p>
-                            )}
+    
+                            <div>
+                                <Label>Categories (comma separated)</Label>
+                                <Input
+                                    {...register('categories', { required: 'Categories are required' })}
+                                    error={errors.categories}
+                                    placeholder="e.g., English, Grammar, Business"
+                                />
+                            </div>
+    
+                            <div>
+                                <Label>Price ($)</Label>
+                                <Input
+                                    type="number"
+                                    step="0.01"
+                                    {...register('price', { required: 'Price is required', min: 0 })}
+                                    error={errors.price}
+                                />
+                            </div>
+    
+                            <div>
+                                <Label>Duration (Weeks)</Label>
+                                <Input
+                                    type="number"
+                                    {...register('durationWeeks', { required: 'Duration is required', min: 1 })}
+                                    error={errors.durationWeeks}
+                                />
+                            </div>
+    
+                            <div className="md:col-span-2">
+                                <Label>Status</Label>
+                                <select
+                                    {...register('status', { required: 'Status is required' })}
+                                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                >
+                                    <option value="DRAFT" className="text-orange-500">Draft</option>
+                                    <option value="PUBLISHED" className="text-green-500">Published</option>
+                                    <option value="ARCHIVED" className="text-gray-500">Archived</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Categories (comma separated)</label>
-                        <input
-                            {...register('categories', { required: 'Categories are required' })}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        />
-                        {errors.categories && <p className="text-red-500 text-sm mt-1">{errors.categories.message}</p>}
+    
+                    {/* Course Content Section */}
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 className="text-lg font-semibold text-gray-700 mb-6 flex items-center">
+                            <FiBookOpen className="mr-2 text-blue-600" />
+                            Course Content
+                        </h3>
+                        <div className="space-y-4">
+                            <Label>Detailed Description</Label>
+                            <ReactQuill
+                                theme="snow"
+                                value={description || ""}
+                                onChange={(value) => setValue('description', value)}
+                                modules={modules}
+                                formats={formats}
+                                className="h-96 mb-8 bg-white rounded-lg border-gray-200"
+                                placeholder="Write your course content here..."
+                            />
+                        </div>
                     </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Status</label>
-                        <select
-                            {...register('status', { required: 'Status is required' })}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        >
-                            <option value="DRAFT">Draft</option>
-                            <option value="PUBLISHED">Published</option>
-                            <option value="ARCHIVED">Archived</option>
-                        </select>
-                    </div>
-                </div>
-
-                {/* Study Materials */}
-                <div className="border-t pt-6">
-                    <h3 className="text-lg font-medium mb-4">Study Materials</h3>
-                    
-                    {fields.map((item, index) => (
-                        <div key={item.id} className="border rounded-lg p-4 mb-4 relative">
+    
+                    {/* Study Materials Section */}
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 className="text-lg font-semibold text-gray-700 mb-6 flex items-center">
+                            <FiLink className="mr-2 text-blue-600" />
+                            Study Materials
+                        </h3>
+                        <div className="space-y-6">
+                            {fields.map((item, index) => (
+                                <div key={item.id} className="border border-gray-100 rounded-lg p-4 bg-gray-50 relative group">
+                                    <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button
+                                            type="button"
+                                            onClick={() => remove(index)}
+                                            className="text-red-500 hover:text-red-700"
+                                        >
+                                            <FiTrash className="w-5 h-5" />
+                                        </button>
+                                    </div>
+    
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <Label>Material Title</Label>
+                                            <Input
+                                                {...register(`studyMaterials.${index}.title`, { required: true })}
+                                                error={errors.studyMaterials?.[index]?.title}
+                                            />
+                                        </div>
+    
+                                        <div>
+                                            <Label>Material Type</Label>
+                                            <select
+                                                {...register(`studyMaterials.${index}.type`, { required: true })}
+                                                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            >
+                                                <option value="PDF">PDF Document</option>
+                                                <option value="VIDEO">Video</option>
+                                                <option value="QUIZ">Quiz</option>
+                                                <option value="LINK">External Link</option>
+                                            </select>
+                                        </div>
+    
+                                        <div className="md:col-span-2">
+                                            <Label>Upload File</Label>
+                                            <FileUploadInput 
+                                                onFileUpload={(file) => handleFileUpload(file, index)}
+                                                acceptedTypes=".pdf,.mp4,.doc,.docx"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+    
                             <button
                                 type="button"
-                                onClick={() => remove(index)}
-                                className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                                onClick={() => append({ title: '', type: 'PDF', fileUrl: '', order: fields.length + 1 })}
+                                className="w-full py-3 border-2 border-dashed border-gray-200 hover:border-blue-300 rounded-xl flex items-center justify-center gap-2 text-gray-600 hover:text-blue-600 transition-colors"
                             >
-                                <FiTrash className="w-5 h-5" />
+                                <FiPlus className="w-5 h-5" />
+                                Add New Material
                             </button>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Title</label>
-                                    <input
-                                        {...register(`studyMaterials.${index}.title`, { required: true })}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Type</label>
-                                    <select
-                                        {...register(`studyMaterials.${index}.type`, { required: true })}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                    >
-                                        <option value="PDF">PDF</option>
-                                        <option value="VIDEO">Video</option>
-                                        <option value="QUIZ">Quiz</option>
-                                        <option value="LINK">Link</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="mt-4">
-                                <label className="block text-sm font-medium text-gray-700">Content</label>
-                                <input
-                                    type="file"
-                                    accept=".pdf,.mp4"
-                                    onChange={(e) => handleFileUpload(e.target.files[0], index)}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                                />
-                            </div>
                         </div>
-                    ))}
-
-                    <button
-                        type="button"
-                        onClick={() => append({ title: '', type: 'PDF', fileUrl: '', order: fields.length + 1 })}
-                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                    >
-                        <FiPlus className="w-4 h-4 mr-2" />
-                        Add Study Material
-                    </button>
-                </div>
-
-                {/* Submit Button */}
-                <div className="flex justify-end">
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
-                    >
-                        {loading ? 'Saving...' : 'Save Changes'}
-                    </button>
-                </div>
-            </form>
-        </div>
+                    </div>
+    
+                    {/* Submit Section */}
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div className="flex justify-end gap-4">
+                            <button
+                                type="button"
+                                onClick={() => navigate(-1)}
+                                className="px-6 py-2.5 text-gray-600 hover:text-gray-800"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="px-8 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 flex items-center gap-2"
+                            >
+                                {loading && <FiLoader className="animate-spin" />}
+                                {loading ? 'Saving Changes...' : 'Save Changes'}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
     );
 };
 
