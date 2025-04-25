@@ -1,0 +1,5 @@
+com\lingocamp\post\model\Post.class
+com\lingocamp\post\PostApiApplication.class
+com\lingocamp\post\service\FirebaseService.class
+com\lingocamp\post\config\FirebaseInitializer.class
+com\lingocamp\post\controller\PostController.class
