@@ -1,4 +1,5 @@
 import './App.css';
+import './index.css';
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
@@ -18,6 +19,8 @@ import Job from './components/JobManagement/Job';
 import Messaging from './components/JobManagement/Messaging';
 import PostJob from './components/JobManagement/PostJob';
 import JobList from './components/JobManagement/JobList';
+
+import PostDashboard from './components/post-management/PostDashboard';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -89,6 +92,7 @@ function App() {
         <Route path='/message' element={<Messaging/>}/>
         <Route path='/postjob' element={<PostJob/>}/>
         <Route path='/joblist' element={<JobList/>}/>
+        <Route path='/postdashboard' element={<PostDashboard/>}/>
       </Routes>
     </Router>
     </ErrorBoundary>
