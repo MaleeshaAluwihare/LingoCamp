@@ -136,7 +136,7 @@ const CourseCreation = () => {
       await axios.post(`http://localhost:8081/lingocamp/api/courses/create`, courseData,
         { headers: { Authorization: `Bearer ${token}` } });
 
-      navigate("/courses");
+      navigate("/mycourses");
 
     } catch (error) {
       console.error("Course creation failed:", error);
