@@ -304,7 +304,7 @@ const CompanyDashboard = () => {
             </span>
             <span
               className="cursor-pointer font-semibold text-blue-600 pb-1"
-              onClick={() => navigate("/joblist")}
+              onClick={() => navigate("/job")}
             >
               Jobs
             </span>
@@ -392,7 +392,7 @@ const CompanyDashboard = () => {
 
                 <button
                   className="py-1 px-4 border border-blue-600 rounded-full text-blue-600 font-medium hover:bg-blue-50"
-                  onClick={() => navigate("/joblist")}
+                  onClick={() => navigate("/job")}
                 >
                   <span>Previously Applied Jobs</span>
                 </button>

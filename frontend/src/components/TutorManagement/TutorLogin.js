@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth, googleProvider, signInWithPopup } from "../../firebaseConfig";
-import { useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "../../firebaseConfig";
+import { useNavigate, Link } from "react-router-dom";
 import axios from 'axios';
+import { FcGoogle } from 'react-icons/fc';
+import { FiArrowRight } from 'react-icons/fi';
 
 const TutorLogin = () => {
     const [email, setEmail] = useState("");
@@ -10,92 +12,59 @@ const TutorLogin = () => {
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
-    // Email/Password Login
-    // const handleEmailLogin = async (e) => {
-    //     e.preventDefault();
-    //     try {
-    //         const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    //         const user = userCredential.user;
-    //         console.log(user)
-    //         navigate("/home");
-    //     } catch (err) {
-    //         console.log(err.code);
-    //         console.log(err.message);
-    //         setError("Invalid email or password");
-    //     }
-    // };
+    // Email/Password login with role-based redirection
     const handleEmailLogin = async (e) => {
         e.preventDefault();
         try {
-          const userCredential = await signInWithEmailAndPassword(auth, email, password);
-          const user = userCredential.user;
-      
-          const response = await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`);
-          const userType = response.data.type;
-      
-          if (userType === "company") {
-            navigate("/jobdashboard");
-          } else {
-            navigate("/home");
-          }
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            const response = await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`);
+            const userType = response.data.type;
+
+            localStorage.removeItem('isGuest');
+
+            if (userType === "company") {
+                navigate("/jobdashboard");
+            } else {
+                navigate("/home");
+            }
         } catch (err) {
-          console.log(err.code);
-          console.log(err.message);
-          setError("Invalid email or password");
+            console.error(err);
+            setError("Invalid email or password");
         }
-      };
-      
-    // Google Login
-    // const handleGoogleLogin = async () => {
-    //     try {
-    //         const result = await signInWithPopup(auth, googleProvider);
-    //         const user = result.user;
-            
-    //         try {
-    //             // Check if profile exists and is complete
-    //             await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`);
-    //             navigate('/home');
-    //         } catch (error) {
-    //             if(error.response?.status === 404) { // Profile incomplete
-    //                 navigate('/tutorcompleteprofile');
-    //             } else {
-    //                 throw error;
-    //             }
-    //         }
-    //     } catch (err) {
-    //         setError("Google sign-in failed");
-    //     }
-    // };
+    };
+
+    // Google login with role-based redirection
     const handleGoogleLogin = async () => {
         try {
-          const result = await signInWithPopup(auth, googleProvider);
-          const user = result.user;
-      
-          try {
-            // 🔍 Check if the user exists in Firestore
-            const response = await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`);
-            const userType = response.data?.type;
-      
-            // 🧭 Route based on user type
-            if (userType === "company") {
-              navigate("/jobdashboard");
-            } else {
-              navigate("/home");
+            const result = await signInWithPopup(auth, googleProvider);
+            const user = result.user;
+
+            try {
+                const response = await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`);
+                const userType = response.data?.type;
+
+                localStorage.removeItem('isGuest');
+
+                if (userType === "company") {
+                    navigate("/jobdashboard");
+                } else {
+                    navigate("/home");
+                }
+            } catch (error) {
+                if (error.response?.status === 404) {
+                    navigate("/tutorcompleteprofile");
+                } else {
+                    console.error(error);
+                    setError("Something went wrong");
+                }
             }
-          } catch (error) {
-            if (error.response?.status === 404) {
-              // 👤 User not found in DB → Send to complete profile page
-              navigate("/tutorcompleteprofile");
-            } else {
-              throw error;
-            }
-          }
         } catch (err) {
-          console.error(err);
-          setError("Google sign-in failed");
+            console.error(err);
+            setError("Google sign-in failed");
         }
-      };
-      
+    };
 
     const handleGuest = async () => {
         localStorage.setItem('isGuest', 'true');
@@ -103,44 +72,92 @@ const TutorLogin = () => {
     };
 
     return (
-        <div className="flex justify-center items-center h-screen">
-            <div className="bg-white shadow-lg rounded-lg p-8 w-96">
-                <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 space-y-6">
+                <div className="text-center">
+                    <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome Back</h1>
+                    <p className="text-gray-500">Sign in to continue to LingoCamp</p>
+                </div>
 
-                {error && <p className="text-red-500 text-center">{error}</p>}
+                {error && (
+                    <div className="p-3 bg-red-50 text-red-700 rounded-lg text-sm">
+                        {error}
+                    </div>
+                )}
 
                 <form onSubmit={handleEmailLogin} className="space-y-4">
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full p-3 border rounded-lg"
-                        required
-                    />
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full p-3 border rounded-lg"
-                        required
-                    />
-                    <button type="submit" className="w-full bg-blue-500 text-white p-3 rounded-lg">
-                        Login
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Email
+                        </label>
+                        <input
+                            type="email"
+                            placeholder="Enter your email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Password
+                        </label>
+                        <input
+                            type="password"
+                            placeholder="Enter your password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg transition-all flex items-center justify-center gap-2"
+                    >
+                        Sign In
+                        <FiArrowRight className="w-5 h-5" />
                     </button>
                 </form>
 
-                <div className="mt-4 text-center">
-                    <button onClick={handleGoogleLogin} className="w-full bg-red-500 text-white p-3 rounded-lg">
-                        Sign in with Google
-                    </button>
+                <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                        <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                    </div>
                 </div>
-                <div className="mt-4 text-center">
-                    <button onClick={handleGuest} className="w-full bg-green-500 text-white p-3 rounded-lg">
+
+                <div className="space-y-3">
+                    <button
+                        onClick={handleGoogleLogin}
+                        className="w-full p-3 border rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                    >
+                        <FcGoogle className="w-6 h-6" />
+                        <span>Google</span>
+                    </button>
+
+                    <button
+                        onClick={handleGuest}
+                        className="w-full p-3 border rounded-lg hover:bg-gray-50 transition-colors text-gray-600"
+                    >
                         Continue as Guest
                     </button>
                 </div>
+
+                <p className="text-center text-sm text-gray-600">
+                    Don't have an account?{' '}
+                    <Link
+                        to="/tutorregistration"
+                        className="text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                        Sign up here
+                    </Link>
+                </p>
             </div>
         </div>
     );
