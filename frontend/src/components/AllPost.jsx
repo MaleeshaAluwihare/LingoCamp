@@ -47,9 +47,10 @@ const AllPosts = () => {
   return (
     <div className="max-w-4xl mx-auto my-8">
       <div className="flex justify-center mb-4">
-        <button className="px-4 py-2 rounded bg-blue-600 text-white">
-          All Posts
-        </button>
+      <h2 className="text-3xl font-bold text-blue-600">
+         All Posts Related to the Companies
+      </h2>
+
       </div>
 
       {loading ? (
