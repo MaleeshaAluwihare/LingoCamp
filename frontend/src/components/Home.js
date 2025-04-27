@@ -247,7 +247,7 @@ const HomePage = () => {
             onClick={() => navigate('/allpost-learner')} // <-- Add this line to handle redirection
             className={`px-4 py-2 rounded ${activeTab === "all" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
           >
-            All Posts
+            Company Posts
           </button>
         </div>
       </div>
