@@ -1,191 +1,230 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // <-- Add this import
+import React, { useState } from "react";
 import axios from "axios";
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/react';
-import { FiGlobe, FiUsers, FiSmartphone, FiChevronDown, FiUser, FiSettings, FiLogOut, FiEdit, FiTrash2 } from 'react-icons/fi'; 
+import { FiGlobe, FiUsers, FiSmartphone, FiChevronDown, FiUser, FiSettings, FiLogOut, FiEdit, FiTrash2 } from 'react-icons/fi';
 import { Link } from "react-router-dom";
 import { auth } from '../firebaseConfig';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { fetchAllCompanyPosts } from "../services/apiService";
-import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/css';
+import { useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
-  const [user] = useAuthState(auth);
-  const [tutorData, setTutorData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isGuest, setIsGuest] = useState(false);
-  const [allPosts, setAllPosts] = useState([]);
-  const [activeTab, setActiveTab] = useState("all");
-  const [newComment, setNewComment] = useState("");
+    const [user] = useAuthState(auth);
+    const [tutorData, setTutorData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [isGuest, setIsGuest] = useState(false);
+    const [tutorProfileComplete, setTutorProfileComplete] = useState(false);
+    const navigate = useNavigate();
 
-  const navigate = useNavigate(); // <-- Initialize the navigate hook
+    useEffect(() => {
+      const fetchUserData = async () => {
+        if(user) {
+          try {
+            const token = await user.getIdToken();
+            const response = await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`,
+              { headers: { Authorization: `Bearer ${token}`}}
+            );
+            setTutorData(response.data);
+          }catch(error){
+            console.error("Error fetching tutor data:", error);
+            setTutorData({});
+          }
+          setLoading(false);
+        }
+      };
+      fetchUserData();
+    },[user]);
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      const posts = await fetchAllCompanyPosts();
-      console.log("Fetched posts:", posts); // 👈 Check console log
-      setAllPosts(posts);
+    useEffect(() => {
+      const checkTutorProfile = async () => {
+        if(user && !isGuest) {
+          try {
+            const token = await user.getIdToken();
+            const response = await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`,
+              { headers: { Authorization: `Bearer ${token}`}}
+            );
+            setTutorProfileComplete(response.data?.profileComplete || false);
+          } catch {
+            setTutorProfileComplete(false);
+          }
+        }
+      };
+      checkTutorProfile();
+    }, [user, isGuest]);
+
+    const handleDashboardNavigation = () => {
+      if (isGuest) {
+        const confirm = window.confirm(
+          'You need a tutor account to navigate to dashboard. Would you like to register now?'
+        );
+        if (confirm) {
+          navigate('/tutorregistration');
+        }
+      } else if (user) {
+        navigate('/coursedashboard');
+      } else {
+        const confirm = window.confirm(
+          'You need to be logged in to navigate to dashboard. Go to login page now?'
+        );
+        if (confirm) {
+          navigate('/tutorlogin');
+        }
+      }
     };
-    fetchPosts();
-  }, []);
 
-  // Handle comment submission
-  const handleCommentSubmit = async (postId) => {
-    if (newComment.trim()) {
-      try {
-        // Make API call to submit the comment for the post
-        await axios.post(`http://localhost:8081/lingocamp/api/posts/${postId}/comments`, {
-          comment: newComment,
-          userId: user?.uid,
-        });
-        setNewComment(""); // Clear input field after submission
-        // Optionally, you can refresh the posts or comments to show the new comment
-        const updatedPosts = await fetchAllCompanyPosts();
-        setAllPosts(updatedPosts);
-      } catch (error) {
-        console.error('Error submitting comment:', error);
+    const getDisplayName = () => {
+      if(tutorData?.firstName) return tutorData.firstName;
+      if(user?.displayName) return user.displayName;
+      if(user?.email) return user.email.split('@')[0];
+      return "Guest";
+    };
+
+    const handleLogout = async () => {
+      if(window.confirm('Are you sure you want to logout?')) {
+        try{
+          await auth.signOut();
+          navigate('/tutorlogin')
+        }catch(error){
+          console.log('Logout failed:', error);
+        }
       }
-    }
-  };
+    };
 
-  const handleLogout = async () => {
-    if(window.confirm('Are you sure you want to logout?')) {
-      try{
-        await auth.signOut();
-        navigate('/tutorlogin')
-      }catch(error){
-        console.log('Logout failed:', error);
+    const handleDeleteProfile = async () => {
+      const confirmation = window.prompt(
+        'Type "DELETE" to confirm permanent profile deletion:'
+      );
+      
+      if (confirmation === "DELETE") {
+        try {
+          const token = await user.getIdToken();
+          await axios.delete(`http://localhost:8081/lingocamp/api/tutors/deleteprofile/${user.uid}`,
+            { headers: { Authorization: `Bearer ${token}`}}
+          );
+          await auth.signOut();
+          navigate('/tutorlogin');
+        } catch (error) {
+          console.error('Deletion failed:', error);
+          alert('Profile deletion failed. Please try again.');
+        }
+      } else {
+        alert('Deletion cancelled. Profile remains active.');
       }
-    }
-  };
+    };
 
-  const handleDeleteProfile = async () => {
-    const confirmation = window.prompt(
-      'Type "DELETE" to confirm permanent profile deletion:'
-    );
+    useEffect(() => {
+      const guestStatus = localStorage.getItem('isGuest');
+      if (user && guestStatus) {
+        localStorage.removeItem('isGuest');
+        setIsGuest(false);
+      } else {
+        setIsGuest(!!guestStatus);
+      }
+    }, [user, navigate]);
+
+
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Navigation */}
+        <nav className="bg-white shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 py-4">
+            <div className="flex justify-between items-center">
+              {/* Logo Section */}
+              <div className="flex items-center">
+                <FiGlobe className="h-8 w-8 text-blue-600" />
+                <span className="ml-2 text-xl font-bold text-gray-800">LingoCamp</span>
+              </div>
     
-    if (confirmation === "DELETE") {
-      try {
-        await axios.delete(`http://localhost:8081/lingocamp/api/tutors/deleteprofile/${user.uid}`);
-        await auth.signOut();
-        navigate('/home');
-      } catch (error) {
-        console.error('Deletion failed:', error);
-        alert('Profile deletion failed. Please try again.');
-      }
-    } else {
-      alert('Deletion cancelled. Profile remains active.');
-    }
-  };
+              {/* Desktop Navigation */}
+              <div className="hidden md:flex items-center space-x-8">
+                <a href="#features" className="text-gray-600 hover:text-blue-600">Features</a>
+                <a href="#pricing" className="text-gray-600 hover:text-blue-600">Pricing</a>
+                <Link to="/tutorlogin" className="text-gray-600 hover:text-blue-600">Login</Link>
+                <Link to="/tutorregistration" className="text-gray-600 hover:text-blue-600">Register</Link>
 
-  useEffect(() => {
-    const guestStatus = localStorage.getItem('isGuest');
-    if (!user && !guestStatus) {
-        navigate('/tutorlogin');
-    }
-    setIsGuest(!!guestStatus);
-  }, [user, navigate]);
-
-  const getDisplayName = () => {
-    if(tutorData?.firstName) return tutorData.firstName;
-    if(user?.displayName) return user.displayName;
-    if(user?.email) return user.email.split('@')[0];
-    return "Guest";
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            {/* Logo Section */}
-            <div className="flex items-center">
-              <FiGlobe className="h-8 w-8 text-blue-600" />
-              <span className="ml-2 text-xl font-bold text-gray-800">LingoCamp</span>
-            </div>
-
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-600 hover:text-blue-600">Features</a>
-              <a href="#pricing" className="text-gray-600 hover:text-blue-600">Pricing</a>
-              <Link to="/tutorlogin" className="text-gray-600 hover:text-blue-600">Login</Link>
-              <Link to="/tutorregistration" className="text-gray-600 hover:text-blue-600">Register</Link>
-
-              {/* User Dropdown */}
-              {!loading && (
-                <Menu as="div" className="relative ml-3">
-                  <div>
-                    <MenuButton className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 focus:outline-none">
-                      <FiUser className="h-5 w-5" />
-                      <span className="font-medium">{getDisplayName()}</span>
-                      <FiChevronDown className="h-4 w-4" />
-                    </MenuButton>
-                  </div>
-                  <MenuItems className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    <MenuItem>
-                      {({ active }) => (
-                        <button
-                          onClick={() => alert('Profile clicked - Add your profile handler')}
-                          className={`${active ? 'bg-blue-100' : ''} block w-full px-4 py-2 text-sm text-gray-700 text-left`}
-                        >
-                          <FiUser className="inline mr-2 h-4 w-4" />
-                          Profile
-                        </button>
-                      )}
-                    </MenuItem>
-                    <MenuItem>
-                      {({ active }) => (
-                        <button
-                          onClick={() => navigate('/tutorprofileupdate')}
-                          className={`${active ? 'bg-blue-100' : ''} block w-full px-4 py-2 text-sm text-gray-700 text-left`}
-                        >
-                          <FiEdit className="inline mr-2 h-4 w-4" />
-                          Update Profile
-                        </button>
-                      )}
-                    </MenuItem>
-                    <MenuItem>
-                      {({ active }) => (
-                        <button
-                          onClick={handleDeleteProfile}
-                          className={`${active ? 'bg-blue-100' : ''} block w-full px-4 py-2 text-sm text-gray-700 text-left`}
-                        >
-                          <FiTrash2 className="inline mr-2 h-4 w-4" />
-                          Delete Profile
-                        </button>
-                      )}
-                    </MenuItem>
-                    <MenuItem>
-                      {({ active }) => (
-                        <button
-                          onClick={() => alert('Settings clicked - Add your settings handler')}
-                          className={`${active ? 'bg-blue-100' : ''} block w-full px-4 py-2 text-sm text-gray-700 text-left`}
-                        >
-                          <FiSettings className="inline mr-2 h-4 w-4" />
-                          Settings
-                        </button>
-                      )}
-                    </MenuItem>
-                    <MenuItem>
-                      {({ active }) => (
-                        <button
-                          onClick={handleLogout}
-                          className={`${active ? 'bg-blue-100' : ''} block w-full px-4 py-2 text-sm text-gray-700 text-left`}
-                        >
-                          <FiLogOut className="inline mr-2 h-4 w-4" />
-                          Logout
-                        </button>
-                      )}
-                    </MenuItem>
-                  </MenuItems>
-                </Menu>
-              )}
+                {/* User Dropdown */}
+                {!loading && (
+                  <Menu as="div" className="relative ml-3">
+                    <div>
+                      <MenuButton className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 focus:outline-none">
+                        <FiUser className="h-5 w-5" />
+                        <span className="font-medium">{getDisplayName()}</span>
+                        <FiChevronDown className="h-4 w-4" />
+                      </MenuButton>
+                    </div>
+                    <MenuItems className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      <MenuItem>
+                        {({ active }) => (
+                          <button
+                            onClick={() => alert('Profile clicked - Add your profile handler')}
+                            className={`${
+                              active ? 'bg-blue-100' : ''
+                            } block w-full px-4 py-2 text-sm text-gray-700 text-left`}
+                          >
+                            <FiUser className="inline mr-2 h-4 w-4" />
+                            Profile
+                          </button>
+                        )}
+                      </MenuItem>
+                      <MenuItem>
+                        {({ active }) => (
+                          <button
+                            onClick={() => navigate('/tutorprofileupdate')}
+                            className={`${
+                              active ? 'bg-blue-100' : ''
+                            } block w-full px-4 py-2 text-sm text-gray-700 text-left`}
+                          >
+                            <FiEdit className="inline mr-2 h-4 w-4" />
+                            Update Profile
+                          </button>
+                        )}
+                      </MenuItem>
+                      <MenuItem>
+                        {({ active }) => (
+                          <button
+                            onClick={handleDeleteProfile}
+                            className={`${
+                              active ? 'bg-blue-100' : ''
+                            } block w-full px-4 py-2 text-sm text-gray-700 text-left`}
+                          >
+                            <FiTrash2 className="inline mr-2 h-4 w-4" />
+                            Delete Profile
+                          </button>
+                        )}
+                      </MenuItem>
+                      <MenuItem>
+                        {({ active }) => (
+                          <button
+                            onClick={() => alert('Settings clicked - Add your settings handler')}
+                            className={`${
+                              active ? 'bg-blue-100' : ''
+                            } block w-full px-4 py-2 text-sm text-gray-700 text-left`}
+                          >
+                            <FiSettings className="inline mr-2 h-4 w-4" />
+                            Settings
+                          </button>
+                        )}
+                      </MenuItem>
+                      <MenuItem>
+                        {({ active }) => (
+                          <button
+                            onClick={handleLogout}
+                            className={`${
+                              active ? 'bg-blue-100' : ''
+                            } block w-full px-4 py-2 text-sm text-gray-700 text-left`}
+                          >
+                            <FiLogOut className="inline mr-2 h-4 w-4" />
+                            Logout
+                          </button>
+                        )}
+                      </MenuItem>
+                    </MenuItems>
+                  </Menu>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </nav>
+        </nav>
 
       {/* Hero Section */}
       <main>
@@ -204,7 +243,13 @@ const HomePage = () => {
               Immerse yourself in real conversations with native speakers from around the world.
             </p>
             <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
-              <button className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+              <button
+                onClick={handleDashboardNavigation}
+                className={`${
+                  isGuest || !user ? 'bg-gray-400 hover:bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'
+                } text-white p-3 rounded-lg transition-colors`}
+                title={isGuest ? "Guest users cannot started" : !user ? "Login to navigate" : ""}
+              >
                 Get Started
               </button>
             </div>
@@ -241,17 +286,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      <div className="max-w-4xl mx-auto my-8">
-        <div className="flex justify-center mb-4">
-          <button
-            onClick={() => navigate('/allpost-learner')} // <-- Add this line to handle redirection
-            className={`px-4 py-2 rounded ${activeTab === "all" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
-          >
-            Company Posts
-          </button>
-        </div>
-      </div>
-
       {/* Footer */}
       <footer className="bg-gray-800 text-white mt-12">
         <div className="max-w-7xl mx-auto px-4 py-8">
@@ -264,6 +298,6 @@ const HomePage = () => {
       </footer>
     </div>
   );
-};
+}
 
 export default HomePage;
