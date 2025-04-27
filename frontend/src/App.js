@@ -12,6 +12,7 @@ import PostJob from './components/JobManagement/PostJob';
 import JobList from './components/JobManagement/JobList';
 import AllCompanyPosts from './components/JobManagement/AllCompanyPosts';
 import CompanyProfile from './components/JobManagement/CompanyProfile';
+import AllPosts from './components/AllPost';
 
 
 function App() {
@@ -31,6 +32,8 @@ function App() {
 
         <Route path='/allpost' element={<AllCompanyPosts/>}/>
         <Route path="/company-profile" element={<CompanyProfile />} />
+        <Route path="/allpost-learner" element={<AllPosts />} />
+        
 
 
       </Routes>
