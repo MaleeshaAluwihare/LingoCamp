@@ -8,7 +8,7 @@ const JobList = ({ jobs }) => {
     <div className="bg-gray-100 min-h-screen pt-16 pb-8">
       <div className="max-w-6xl mx-auto px-4">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold">Language Related Opportunities</h1>
+          <h1 className="text-2xl font-bold">Language Related Job Opportunities</h1>
           <p className="text-gray-600">Browse through the available job postings</p>
         </div>
 
