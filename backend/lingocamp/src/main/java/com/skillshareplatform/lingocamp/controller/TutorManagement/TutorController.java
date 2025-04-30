@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.encrypt.RsaAlgorithm;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -18,11 +19,8 @@ import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.FirebaseToken;
 import com.skillshareplatform.lingocamp.model.TutorManagement.TutorModel;
 import com.skillshareplatform.lingocamp.service.TutorManagement.TutorService;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/lingocamp/api/tutors")
@@ -38,8 +36,13 @@ public class TutorController {
     @PostMapping("/register")
     public ResponseEntity<String> registerTutor(@RequestBody TutorModel tutor) {
         try{
-            tutorService.registerTutor(tutor);
-            return ResponseEntity.ok("Registered successfully");  
+            //count existing tutors to generate new tutorID
+            QuerySnapshot tutorSnapshot = firestore.collection("Tutors").get().get();
+            int tutorCount = tutorSnapshot.size();
+
+            //Register the tutor and return tutor ID
+            String tutorId = tutorService.registerTutor(tutor, tutorCount);
+            return ResponseEntity.ok(tutorId);  
 
         }catch (IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -50,15 +53,8 @@ public class TutorController {
 
     // get tutor
     @GetMapping("/{uid}")
-    public ResponseEntity<TutorModel> getTutorByUid(@PathVariable String uid,HttpServletRequest request) {
+    public ResponseEntity<TutorModel> getTutorByUid(@PathVariable String uid) {
         try {
-
-            FirebaseToken decodedToken = (FirebaseToken) request.getAttribute("firebaseToken");
-
-            if (decodedToken == null || !decodedToken.getUid().equals(uid)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // user trying to access another user's data
-            }
-            
             DocumentSnapshot doc = firestore.collection("Tutors").document(uid).get().get();
             
             if(doc.exists()) {
@@ -94,17 +90,13 @@ public class TutorController {
 
     // Update existing profile (PATCH for partial updates)
     @PatchMapping("updateprofile/{uid}")
-    public ResponseEntity<String> updateTutorProfile(@PathVariable String uid,@RequestBody TutorModel tutorData,HttpServletRequest request) {
+    public ResponseEntity<String> updateTutorProfile(
+        @PathVariable String uid,
+        @RequestBody TutorModel tutorData
+    ) {
         try {
-            FirebaseToken decodedToken = (FirebaseToken) request.getAttribute("firebaseToken");
-
-            if (decodedToken == null || !decodedToken.getUid().equals(uid)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // user trying to access another user's data
-            }
-
             String result = tutorService.updateTutorProfile(uid, tutorData);
             return ResponseEntity.ok(result);
-
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (InterruptedException | ExecutionException e) {
@@ -114,17 +106,10 @@ public class TutorController {
 
     // Delete existing profile
     @DeleteMapping("deleteprofile/{uid}")
-    public ResponseEntity<String> deleteTutorProfile(@PathVariable String uid,HttpServletRequest request) {
+    public ResponseEntity<String> deleteTutorProfile(@PathVariable String uid) {
         try {
-            FirebaseToken decodedToken = (FirebaseToken) request.getAttribute("firebaseToken");
-
-            if (decodedToken == null || !decodedToken.getUid().equals(uid)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // user trying to access another user's data
-            }
-
             tutorService.deleteTutorProfile(uid);
             return ResponseEntity.ok("Profile deleted successfully");
-            
         } catch (FirebaseAuthException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not in authentication system");
         }catch (InterruptedException | ExecutionException e) {
