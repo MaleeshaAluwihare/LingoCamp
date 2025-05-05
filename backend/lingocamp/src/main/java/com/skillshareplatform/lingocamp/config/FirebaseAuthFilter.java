@@ -48,10 +48,10 @@ public class FirebaseAuthFilter extends OncePerRequestFilter {
                         authorities
                 );
 
-                //  Set authenticated to true
+                // ✅ Set authenticated to true
                 authenticationToken.setDetails(decodedToken);
 
-                //  Add to context
+                // ✅ Add to context
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
             } catch (FirebaseAuthException e) {
@@ -65,3 +65,4 @@ public class FirebaseAuthFilter extends OncePerRequestFilter {
     }
     
 }
+

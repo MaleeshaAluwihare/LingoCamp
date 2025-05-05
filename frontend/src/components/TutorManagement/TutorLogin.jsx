@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { auth, googleProvider } from "../../firebaseConfig";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth, googleProvider, signInWithPopup } from "../../firebaseConfig";
 import { useNavigate, Link } from "react-router-dom";
 import axios from 'axios';
 import { FcGoogle } from 'react-icons/fc';
@@ -12,56 +12,30 @@ const TutorLogin = () => {
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
-    // Email/Password login with role-based redirection
     const handleEmailLogin = async (e) => {
         e.preventDefault();
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-
-            const response = await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`);
-            const userType = response.data.type;
-
+            await signInWithEmailAndPassword(auth, email, password);
             localStorage.removeItem('isGuest');
-
-            if (userType === "company") {
-                navigate("/jobdashboard");
-            } else {
-                navigate("/home");
-            }
+            navigate("/home");
         } catch (err) {
-            console.error(err);
             setError("Invalid email or password");
         }
     };
 
-    // Google login with role-based redirection
     const handleGoogleLogin = async () => {
         try {
             const result = await signInWithPopup(auth, googleProvider);
-            const user = result.user;
-
             try {
-                const response = await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`);
-                const userType = response.data?.type;
-
-                localStorage.removeItem('isGuest');
-
-                if (userType === "company") {
-                    navigate("/jobdashboard");
-                } else {
-                    navigate("/home");
-                }
+                await axios.get(`http://localhost:8081/lingocamp/api/tutors/${result.user.uid}`);
+                localStorage.removeItem('isGuest'); 
+                navigate('/home');
             } catch (error) {
-                if (error.response?.status === 404) {
-                    navigate("/tutorcompleteprofile");
-                } else {
-                    console.error(error);
-                    setError("Something went wrong");
+                if(error.response?.status === 404) {
+                    navigate('/tutorcompleteprofile');
                 }
             }
         } catch (err) {
-            console.error(err);
             setError("Google sign-in failed");
         }
     };
@@ -69,7 +43,7 @@ const TutorLogin = () => {
     const handleGuest = async () => {
         localStorage.setItem('isGuest', 'true');
         navigate('/home');
-    };
+      };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">
@@ -99,7 +73,7 @@ const TutorLogin = () => {
                             required
                         />
                     </div>
-
+                    
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Password

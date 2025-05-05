@@ -2,6 +2,7 @@ package com.skillshareplatform.lingocamp.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -17,26 +18,18 @@ public class SecurityConfig {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
-            .requestMatchers(
-                "/lingocamp/api/tutors/**",
-                "/lingocamp/api/tutors/register",
-                "/lingocamp/api/tutors/completeprofile/**",
-                "/lingocamp/api/tutors/updateprofile/**",
-                "/lingocamp/api/tutors/deleteprofile/**",
-                "/lingocamp/api/company/posts/all"
-            ).permitAll()
-        
-            .requestMatchers(
-                "/lingocamp/api/company/posts/all",
-                "/lingocamp/api/company/posts/create",
-                "/lingocamp/api/company/posts/my-posts",
-                "/lingocamp/api/company/posts/update/**",
-                "/lingocamp/api/company/posts/**"
-            ).authenticated()
+                .requestMatchers(
+                    "/lingocamp/api/tutors/register",
+                    "/lingocamp/api/tutors/login",
+                    "/lingocamp/api/courses" // GET requests only
+                ).permitAll()
+                .requestMatchers(HttpMethod.GET, "/lingocamp/api/tutors/*").permitAll()
+                .requestMatchers(HttpMethod.PATCH, "/lingocamp/api/tutors/updateprofile/**").authenticated()
+                .requestMatchers(HttpMethod.POST, "/lingocamp/api/courses/create").authenticated()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(new FirebaseAuthFilter(), UsernamePasswordAuthenticationFilter.class)
-            .csrf(csrf -> csrf.disable());  // Consider disabling CSRF for API endpoints
+            .csrf(csrf -> csrf.disable());
 
         return http.build();
     }

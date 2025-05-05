@@ -138,15 +138,15 @@ const JobPage = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-bold">Previously Applied Jobs</h1>
-            {/* <p className="text-gray-600">Find or post jobs in language education and translation</p> */}
+            <h1 className="text-2xl font-bold">Language Related Opportunities</h1>
+            <p className="text-gray-600">Find or post jobs in language education and translation</p>
           </div>
-          {/* <button 
+          <button 
                   onClick={() => navigate('/postjob')}
                   className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
           >
             Post New Job
-          </button> */}
+          </button>
         </div>
 
   
@@ -154,9 +154,9 @@ const JobPage = () => {
         {/* Job Form */}
         {showJobForm && (
           <div className="bg-white rounded-lg shadow p-6 mb-6">
-            {/* <h2 className="text-xl font-semibold mb-4">
+            <h2 className="text-xl font-semibold mb-4">
               {editingJob ? "Edit Job Posting" : "Create New Job Posting"}
-            </h2> */}
+            </h2>
             <form onSubmit={handleSubmitJob}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
@@ -285,12 +285,12 @@ const JobPage = () => {
                   </div>
                 </div>
                 <div className="text-right">
-                  {/* <button
+                  <button
                     onClick={() => handleToggleStatus(job.id)}
                     className={`px-4 py-2 rounded-md text-white ${job.status === "Active" ? "bg-green-500" : "bg-gray-500"}`}
                   >
                     {job.status === "Active" ? "Deactivate" : "Activate"}
-                  </button> */}
+                  </button>
                 </div>
               </div>
               <p className="text-sm text-gray-600">{job.description}</p>
@@ -299,18 +299,18 @@ const JobPage = () => {
                   Posted {job.posted} - {job.applicants} Applicants
                 </div>
                 <div className="flex space-x-2">
-                  {/* <button
+                  <button
                     onClick={() => handleEditJob(job)}
                     className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600"
                   >
                     Edit
-                  </button> */}
-                  {/* <button
+                  </button>
+                  <button
                     onClick={() => handleDeleteJob(job.id)}
                     className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
                   >
                     Delete
-                  </button> */}
+                  </button>
                 </div>
               </div>
             </div>
