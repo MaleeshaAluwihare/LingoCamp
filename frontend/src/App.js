@@ -15,10 +15,15 @@ import CourseUpdate from './pages/CourseManagement/CourseUpdate';
 import Course from './pages/CourseManagement/Courses';
 
 import JobDashboard from './components/JobManagement/JobDashboard';
-import Job from './components/JobManagement/Job';
-import Messaging from './components/JobManagement/Messaging';
+
+
 import PostJob from './components/JobManagement/PostJob';
 import JobList from './components/JobManagement/JobList';
+import AllCompanyPosts from './components/JobManagement/AllCompanyPosts';
+import CompanyProfile from './components/JobManagement/CompanyProfile';
+import AllPosts from './components/AllPost';
+
+
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -90,10 +95,15 @@ function App() {
         <Route path='/courses' element={<Course/>}/>
 
         <Route path='/jobdashboard' element={<JobDashboard/>}/>
-        <Route path='/job' element={<Job/>}/>
-        <Route path='/message' element={<Messaging/>}/>
+        
+        
         <Route path='/postjob' element={<PostJob/>}/>
         <Route path='/joblist' element={<JobList/>}/>
+
+        <Route path='/allpost' element={<AllCompanyPosts/>}/>
+        <Route path="/company-profile" element={<CompanyProfile />} />
+        <Route path="/allpost-learner" element={<AllPosts />} />
+        
       </Routes>
     </Router>
     </ErrorBoundary>
