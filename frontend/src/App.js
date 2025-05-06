@@ -14,7 +14,7 @@ import CourseDashboard from './components/CourseManagement/CourseDashboard';
 import CourseUpdate from './components/CourseManagement/CourseUpdate';
 
 import JobDashboard from './components/JobManagement/JobDashboard';
-import Job from './components/JobManagement/Job';
+
 
 import PostJob from './components/JobManagement/PostJob';
 import JobList from './components/JobManagement/JobList';
@@ -90,7 +90,7 @@ function App() {
         <Route path="/updatecourse/:courseId" element={<CourseUpdate/>}/>
         <Route path='/mycourses' element={<CourseDisplay/>}/>
         <Route path='/jobdashboard' element={<JobDashboard/>}/>
-        <Route path='/job' element={<Job/>}/>
+        
         
         <Route path='/postjob' element={<PostJob/>}/>
         <Route path='/joblist' element={<JobList/>}/>
