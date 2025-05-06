@@ -73,6 +73,24 @@ public class TutorController {
         }
     }
 
+    // New public endpoint for tutor profiles
+    @GetMapping("/public/{uid}")
+    public ResponseEntity<TutorModel> getPublicTutorProfile(@PathVariable String uid) {
+        try {
+            DocumentSnapshot doc = firestore.collection("Tutors").document(uid).get().get();
+            
+            if(doc.exists()) {
+                TutorModel tutor = doc.toObject(TutorModel.class);
+                return ResponseEntity.ok(tutor);
+            }
+            
+            return ResponseEntity.notFound().build();
+            
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     // Profile completion 
     @PostMapping("/completeprofile/{uid}")
     public ResponseEntity<String> completeProfile(
