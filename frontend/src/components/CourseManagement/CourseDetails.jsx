@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Link } from "react-router-dom";
 import { InstructorSkeleton } from '../../components/UI/SkeletonLoader';
 import Man from '../UI/man.png'
-import { FiClock, FiBook, FiUsers, FiCheckCircle } from 'react-icons/fi';
+import { FiClock, FiBook, FiUsers, FiCheckCircle, FiArrowRight } from 'react-icons/fi';
 
 export default function CourseDetails({ course, onBack }) {
   const [instructor, setInstructor] = useState(null);
@@ -176,7 +177,7 @@ export default function CourseDetails({ course, onBack }) {
                         className="w-12 h-12 rounded-full mr-3"
                         alt={instructor.firstName}
                         onError={(e) => {
-                          e.target.src = '/default-avatar.png';
+                          e.target.src = Man;
                         }}
                       />
                       <div>
@@ -184,6 +185,17 @@ export default function CourseDetails({ course, onBack }) {
                         <p className="text-sm text-gray-500">
                           {instructor.specialization || 'Language Expert'}
                         </p>
+                        <Link 
+                          to={`/tutors/${instructor.uid}`}
+                          className="group inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm"
+                          aria-label={`View ${instructor.firstName}'s full profile`}
+                          title="Explore tutor's qualifications and experience"
+                        >
+                          <span className="relative border-b border-transparent group-hover:border-blue-600 pb-0.5 transition-all">
+                            See Full Profile
+                          </span>
+                          <FiArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+                        </Link>
                       </div>
                     </div>
                   </>
