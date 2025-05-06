@@ -1,7 +1,10 @@
 package com.skillshareplatform.lingocamp.controller.CourseManagement;
 
 import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.Query;
+import com.google.cloud.firestore.Query.Direction;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.auth.FirebaseToken;
@@ -16,10 +19,12 @@ import com.skillshareplatform.lingocamp.service.CourseManagement.CourseService;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/lingocamp/api/courses")
@@ -159,4 +164,45 @@ public class CourseController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Unexpected error occurred"));
         }
     }
+
+    //endpoint for learners
+    @GetMapping("/all")
+    public ResponseEntity<Map<String, Object>> getAllPublishedCourses(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "6") int size,
+            @RequestParam(required = false) String category,
+            @RequestParam(defaultValue = "asc") String sortByPrice
+    ) {
+        try {
+            CollectionReference coursesRef = firestore.collection("Courses");
+            Query query = coursesRef.whereEqualTo("status", "PUBLISHED");
+
+            if (category != null && !category.isEmpty()) {
+                query = query.whereEqualTo("categories", category);
+            }
+
+            // Sorting (Firestore only supports ordering with indexing on combined fields)
+            // query = query.orderBy("price", sortByPrice.equals("asc") ? Direction.ASCENDING : Direction.DESCENDING);
+
+            ApiFuture<QuerySnapshot> querySnapshot = query.get();
+            List<QueryDocumentSnapshot> documents = querySnapshot.get().getDocuments();
+
+            int startIndex = (page - 1) * size;
+            int endIndex = Math.min(startIndex + size, documents.size());
+
+            List<CourseModel> paginatedCourses = documents.subList(startIndex, endIndex)
+                    .stream()
+                    .map(doc -> doc.toObject(CourseModel.class))
+                    .collect(Collectors.toList());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("courses", paginatedCourses);
+            response.put("total", documents.size());
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }   
 }

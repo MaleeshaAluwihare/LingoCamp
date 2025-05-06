@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import MDEditor from '@uiw/react-md-editor';
 import { useDropzone } from 'react-dropzone';
+import { FiBook, FiImage, FiDollarSign, FiCalendar, FiCheck, FiGlobe, FiFile } from 'react-icons/fi';
 
 const CourseCreation = () => {
   const { register, handleSubmit, formState: { errors } } = useForm({defaultValues: {categories: ""}});
@@ -135,7 +136,7 @@ const CourseCreation = () => {
       await axios.post(`http://localhost:8081/lingocamp/api/courses/create`, courseData,
         { headers: { Authorization: `Bearer ${token}` } });
 
-      navigate("/courses");
+      navigate("/mycourses");
 
     } catch (error) {
       console.error("Course creation failed:", error);
@@ -149,7 +150,8 @@ const CourseCreation = () => {
 
       {/* Cover Image Upload */}
       <div className="mb-8">
-        <label className="block text-sm font-medium text-gray-700 mb-3">Course Cover Image</label>
+        <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
+        <FiImage className="w-4 h-4 text-blue-600" />Course Cover Image</label>
         <div
           {...getRootProps()}
           className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer
@@ -200,7 +202,8 @@ const CourseCreation = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Course Title</label>
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+            <FiBook className="w-4 h-4 text-blue-600" />Course Title</label>
             <input
               {...register("title", { required: "Title is required" })}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -209,7 +212,8 @@ const CourseCreation = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Price ($)</label>
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+            <FiDollarSign className="w-4 h-4 text-blue-600" />Price ($)</label>
             <input
               type="number"
               step="0.01"
@@ -220,7 +224,8 @@ const CourseCreation = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Duration (weeks)</label>
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+            <FiCalendar className="w-4 h-4 text-blue-600" />Duration (weeks)</label>
             <input
               type="number"
               {...register("durationWeeks", { required: "Duration is required" })}
@@ -230,7 +235,8 @@ const CourseCreation = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+            <FiCheck className="w-4 h-4 text-blue-600" />Status</label>
             <select
               {...register("status", { required: "Status is required" })}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -246,7 +252,8 @@ const CourseCreation = () => {
 
        {/* Course Content */}
         <div className="mb-8">  
-          <label className="block text-sm font-medium text-gray-700 mb-3">Course Content</label>
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
+          <FiBook className="w-4 h-4 text-blue-600" />Course Content</label>
           <ReactQuill
             theme="snow"
             value={description}
@@ -260,7 +267,8 @@ const CourseCreation = () => {
 
         {/* Course Category */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2 mt-24">Language</label>
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2 mt-24">
+          <FiGlobe className="w-4 h-4 text-blue-600" />Language</label>
           <input
             list="languageCategories"
             {...register("categories", {
@@ -284,7 +292,7 @@ const CourseCreation = () => {
 
         {/* Study Materials Section */}
         <div className="border-t pt-8">
-          <h3 className="text-xl font-semibold mb-6 text-gray-800">Study Materials</h3>
+          <h3 className="flex items-center gap-2 text-xl font-semibold mb-6 text-gray-800"><FiFile className="w-5 h-5 text-blue-600" />Study Materials</h3>
 
           <div className="bg-gray-50 p-4 rounded-lg mb-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
