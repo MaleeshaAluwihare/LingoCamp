@@ -7,6 +7,7 @@ import TutorLogin from './pages/TutorManagement/TutorLogin';
 import HomePage from './pages/Home';
 import TutorCompleteProfile from './pages/TutorManagement/TutorProfileCompletion';
 import TutorProfileUpdate from './pages/TutorManagement/TutorProfileUpdate';
+import TutorProfile from './pages/TutorManagement/TutorProfile';
 
 import CreateCourse from './pages/CourseManagement/CourseCreation';
 import CourseDisplay from './pages/CourseManagement/CourseDisplay';
@@ -87,6 +88,7 @@ function App() {
         <Route path='/tutorregistration' element={<TutorRegistration/>}/>
         <Route path='/tutorcompleteprofile' element={<TutorCompleteProfile/>}/>
         <Route path='/tutorprofileupdate' element={<TutorProfileUpdate/>}/>
+        <Route path='/tutors/:tutoruid' element={<TutorProfile/>}/>
 
         <Route path='/coursedashboard' element={<CourseDashboard/>}/>
         <Route path='/createcourse' element={<CreateCourse/>}/>
