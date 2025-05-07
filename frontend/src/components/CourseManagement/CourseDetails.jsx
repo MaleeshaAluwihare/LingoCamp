@@ -111,7 +111,7 @@ export default function CourseDetails({ course, onBack }) {
             <h2 className="text-xl font-semibold mb-4">What You'll Learn</h2>
             <div 
               className="prose max-w-none mb-8"
-              dangerouslySetInnerHTML={{ __html: course.description }} 
+              dangerouslySetInnerHTML={{ __html: course.introduction }} 
             />
 
             <div className="mb-8">

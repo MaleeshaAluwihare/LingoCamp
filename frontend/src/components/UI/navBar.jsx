@@ -91,11 +91,13 @@ const NavBar = ({ loading: loadingProp }) => {
           {/* Logo Section */}
           <div className="flex items-center">
             <FiGlobe className="h-8 w-8 text-blue-600" />
-            <span className="ml-2 text-xl font-bold text-gray-800">LingoCamp</span>
+            <Link to="/home" className="ml-2 text-xl font-bold text-gray-800 hover:text-blue-600">LingoCamp</Link>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
+            <a href="#features" className="text-gray-600 hover:text-blue-600">About Us</a>
+            <a href="#pricing" className="text-gray-600 hover:text-blue-600">FAQ</a>
             <a href="#features" className="text-gray-600 hover:text-blue-600">Features</a>
             <a href="#pricing" className="text-gray-600 hover:text-blue-600">Pricing</a>
             {!user && (
@@ -119,7 +121,7 @@ const NavBar = ({ loading: loadingProp }) => {
                   <MenuItem>
                     {({ active }) => (
                       <button
-                        onClick={() => alert('Profile clicked - Add your profile handler')}
+                        onClick={() => navigate(`/tutors/${user.uid}`)}
                         className={`${active ? 'bg-blue-100' : ''} block w-full px-4 py-2 text-sm text-gray-700 text-left`}
                       >
                         <FiUser className="inline mr-2 h-4 w-4" />

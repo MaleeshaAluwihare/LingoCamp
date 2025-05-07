@@ -6,18 +6,25 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { FaFacebook, FaInstagram, FaYoutube, FaLinkedin, FaGithub, FaMedium, FaReddit, FaGlobe,  } from 'react-icons/fa';
-import { FiChevronDown, FiTrash2, FiPlus } from 'react-icons/fi';
+import { FiChevronDown, FiTrash2, FiPlus, FiEyeOff, FiEye } from 'react-icons/fi';
 
 const TutorRegistration = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [profileImage, setProfileImage] = useState(null);
   const [specializations, setSpecializations] = useState([]);
   const [socialLinks, setSocialLinks] = useState([]);
   const [newSpec, setNewSpec] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [newLink, setNewLink] = useState({ platform: "", url: "" });
   const navigate = useNavigate();
+
+  const password = watch("password");
+
+  const togglePassword = () => setShowPassword(!showPassword);
+  const toggleConfirm = () => setShowConfirm(!showConfirm);
 
   const SOCIAL_PLATFORMS = [
     { name: 'LinkedIn', value: 'linkedin', icon: <FaLinkedin className="text-blue-600" />, pattern: /^(https?:\/\/)?(www\.)?linkedin\.com\/.+/ },
@@ -141,6 +148,29 @@ const TutorRegistration = () => {
                   <p className="text-red-500 text-sm mt-1">{errors.lastName.message}</p>
                 )}
               </div>
+
+               {/* Password Field */}
+              <div className="relative">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Password *
+                </label>
+                <input
+                  {...register("password", { required: "Password is required" })}
+                  type={showPassword ? "text" : "password"}
+                  className="w-full p-3 border rounded-lg mt-1 focus:ring-2 focus:ring-blue-500 pr-10"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={togglePassword}
+                  className="absolute right-5 top-[48px] text-gray-500"
+                >
+                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
+                {errors.password && (
+                  <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+                )}
+              </div>
   
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -156,19 +186,33 @@ const TutorRegistration = () => {
                   <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
                 )}
               </div>
-  
-              <div>
+
+              {/* Confirm Password Field */}
+              <div className="relative mt-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Password *
-                  <input
-                    {...register("password", { required: "Required" })}
-                    className="w-full p-3 border rounded-lg mt-1 focus:ring-2 focus:ring-blue-500"
-                    type="password"
-                    placeholder="••••••••"
-                  />
+                  Re-Enter Password *
                 </label>
-                {errors.password && (
-                  <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+                <input
+                  {...register("confirmPassword", {
+                    required: "Please confirm your password",
+                    validate: (value) =>
+                      value === password || "Passwords do not match",
+                  })}
+                  type={showConfirm ? "text" : "password"}
+                  className="w-full p-3 border rounded-lg mt-1 focus:ring-2 focus:ring-blue-500 pr-10"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={toggleConfirm}
+                  className="absolute right-5 top-[48px] text-gray-500"
+                >
+                  {showConfirm ? <FiEyeOff /> : <FiEye />}
+                </button>
+                {errors.confirmPassword && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.confirmPassword.message}
+                  </p>
                 )}
               </div>
             </div>
