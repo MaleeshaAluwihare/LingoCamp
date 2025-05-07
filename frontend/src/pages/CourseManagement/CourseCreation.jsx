@@ -25,6 +25,7 @@ const CourseCreation = () => {
     type: "PDF",
     file: null
   });
+  const [introduction, setIntroduction] = useState("");
   const [description, setDescription] = useState("");
   const [materialContent, setMaterialContent] = useState("");
   const [coverImage, setCoverImage] = useState(null);
@@ -130,6 +131,7 @@ const CourseCreation = () => {
         studyMaterials,
         price: parseFloat(data.price),
         durationWeeks: parseInt(data.durationWeeks),
+        introduction,
         description,
         coverImage,
       };
@@ -253,6 +255,21 @@ const CourseCreation = () => {
                 <p className="text-red-500 text-sm mt-1">{errors.status.message}</p>
               )}
             </div>
+          </div>
+
+            {/* Course Introduction */}
+          <div className="mb-22">  
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
+            <FiBook className="w-4 h-4 text-blue-600" />Course Introduction</label>
+            <ReactQuill
+              theme="snow"
+              value={introduction}
+              onChange={setIntroduction}
+              modules={modules}
+              formats={formats}
+              className="h-64 mb-4 bg-white rounded-lg border-gray-300"  
+              placeholder="Write your course introduction here..."
+            />
           </div>
 
         {/* Course Content */}

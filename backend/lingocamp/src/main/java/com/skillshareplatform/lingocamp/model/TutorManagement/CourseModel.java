@@ -13,6 +13,7 @@ public class CourseModel {
     private String courseId;  
     private String tutorId;           // Firebase UID of creator
     private String title;
+    private String introduction;
     private String description;
     private double price;
     private int durationWeeks;
