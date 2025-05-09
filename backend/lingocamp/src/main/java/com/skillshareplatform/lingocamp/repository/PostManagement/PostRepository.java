@@ -15,6 +15,6 @@ public class PostRepository {
     private Firestore firestore;
 
     public ApiFuture<WriteResult> savePost(PostModel post){
-        return firestore.collection("Posts").document(post.getPostId()).set(post);
+        return firestore.collection("Posts").document(post.getPostId()).set(post); 
     }
 }
