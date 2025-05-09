@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FiGlobe, FiUsers, FiSmartphone } from 'react-icons/fi';
 import { auth } from '../firebaseConfig';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import  Navbar  from '../components/UI/navBar';
 
