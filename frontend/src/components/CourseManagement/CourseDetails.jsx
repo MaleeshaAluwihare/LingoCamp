@@ -10,6 +10,8 @@ export default function CourseDetails({ course, onBack }) {
   const [loadingInstructor, setLoadingInstructor] = useState(true);
   const [instructorError, setInstructorError] = useState(null);
 
+  const userId = "j4jjtj5yj5jn2en2knkk3ttn3ktn";
+
   useEffect(() => {
     const fetchInstructor = async () => {
       if (course?.tutorId) {
@@ -31,6 +33,30 @@ export default function CourseDetails({ course, onBack }) {
     fetchInstructor();
   }, [course?.tutorId]);
 
+  const handleEnroll = async () => {
+    if (!userId || !course?.courseId || !course?.tutorId) {
+      alert("Missing required information for enrollment.");
+      return;
+    }
+
+    try {
+      const enrollment = {
+        courseId: course.courseId,
+        courseName: course.title,
+        tutorId: course.tutorId,
+        userId: userId,
+        amountPaid: course.price
+      };
+
+      await axios.post("http://localhost:8081/lingocamp/api/courses/enroll", enrollment);
+      alert("Enrollment successful!");
+    } catch (error) {
+      console.error("Enrollment failed:", error);
+      alert("Enrollment failed. Please try again.");
+    }
+  };
+
+
   if (!course) return null;
 
   return (
@@ -48,6 +74,7 @@ export default function CourseDetails({ course, onBack }) {
             <p className="text-sm text-gray-500">30-day money-back guarantee</p>
           </div>
           <button 
+            onClick={handleEnroll}
             className="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg 
                       hover:from-blue-600 hover:to-blue-700 transition-all flex items-center"
           >
