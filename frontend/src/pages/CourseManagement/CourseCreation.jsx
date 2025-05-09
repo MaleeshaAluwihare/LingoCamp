@@ -257,33 +257,35 @@ const CourseCreation = () => {
             </div>
           </div>
 
-            {/* Course Introduction */}
-          <div className="mb-22">  
+          {/* Course Introduction */}
+          <div className="mb-8">  {/* Changed from mb-22 (invalid) to mb-8 */}
             <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
-            <FiBook className="w-4 h-4 text-blue-600" />Course Introduction</label>
+              <FiBook className="w-4 h-4 text-blue-600" />Course Introduction
+            </label>
             <ReactQuill
               theme="snow"
               value={introduction}
               onChange={setIntroduction}
               modules={modules}
               formats={formats}
-              className="h-64 mb-4 bg-white rounded-lg border-gray-300"  
+              className="h-64 mb-6 bg-white rounded-lg border-gray-300"
               placeholder="Write your course introduction here..."
             />
           </div>
 
-        {/* Course Content */}
-          <div className="mb-8">  
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
-            <FiBook className="w-4 h-4 text-blue-600" />Course Content</label>
+          {/* Course Content */}
+          <div className="mb-12">  
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3 mt-24">
+              <FiBook className="w-4 h-4 text-blue-600" />Course Content
+            </label>
             <ReactQuill
               theme="snow"
               value={description}
               onChange={setDescription}
               modules={modules}
               formats={formats}
-              className="h-64 mb-4 bg-white rounded-lg border-gray-300"  
-              placeholder="Write your course Content here..."
+              className="h-64 bg-white rounded-lg border-gray-300"
+              placeholder="Write your course content here..."
             />
           </div>
 

@@ -21,6 +21,12 @@ public class TutorModel {
     private List<TutorSocialLink> socialLinks;
     private Timestamp createAt;
     private boolean profileComplete = false;
+    private String type;
+
+    private String companyName;
+    private String username;
+    private String address;
+    private String about;
 
     public TutorModel(){} //Empty constructor required by Firestore
 

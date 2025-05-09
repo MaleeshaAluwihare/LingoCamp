@@ -6,7 +6,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import axios from 'axios';
 import { auth } from '../../firebaseConfig'
 
-const NavBar = ({ loading: loadingProp }) => {
+const HomeNavBar = ({ loading: loadingProp }) => {
   const [user] = useAuthState(auth);
   const [tutorData, setTutorData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -18,7 +18,7 @@ const NavBar = ({ loading: loadingProp }) => {
       if (user) {
         try {
           const token = await user.getIdToken();
-          const response = await axios.get(`http://localhost:8081/lingocamp/api/tutors/${user.uid}`,
+          const response = await axios.get(`http://localhost:8081/lingocamp/api/learners/${user.uid}`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
           setTutorData(response.data);
@@ -53,7 +53,7 @@ const NavBar = ({ loading: loadingProp }) => {
     if (window.confirm('Are you sure you want to logout?')) {
       try {
         await auth.signOut();
-        navigate('/tutorlogin');
+        navigate('/learnerlogin');
       } catch (error) {
         console.log('Logout failed:', error);
       }
@@ -72,7 +72,7 @@ const NavBar = ({ loading: loadingProp }) => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         await auth.signOut();
-        navigate('/tutorlogin');
+        navigate('/learnerlogin');
       } catch (error) {
         console.error('Deletion failed:', error);
         alert('Profile deletion failed. Please try again.');
@@ -89,14 +89,14 @@ const NavBar = ({ loading: loadingProp }) => {
           {/* Logo Section */}
           <div className="flex items-center">
             <FiGlobe className="h-8 w-8 text-blue-600" />
-            <Link to="/home" className="ml-2 text-xl font-bold text-gray-800 hover:text-blue-600">LingoCamp</Link>
+            <Link to="/learner-home" className="ml-2 text-xl font-bold text-gray-800 hover:text-blue-600">LingoCamp</Link>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
+            <Link to="/courses" className="text-gray-600 hover:text-blue-600">Courses</Link>
             <a href="#features" className="text-gray-600 hover:text-blue-600">About Us</a>
             <a href="#pricing" className="text-gray-600 hover:text-blue-600">FAQ</a>
-            <a href="#features" className="text-gray-600 hover:text-blue-600">Features</a>
             <a href="#pricing" className="text-gray-600 hover:text-blue-600">Pricing</a>
             {!user && (
               <div className="flex items-center space-x-4">
@@ -151,7 +151,7 @@ const NavBar = ({ loading: loadingProp }) => {
                   <MenuItem>
                     {({ active }) => (
                       <button
-                        onClick={() => navigate(`/tutors/${user.uid}`)}
+                        onClick={() => navigate(`/learners/${user.uid}`)}
                         className={`${active ? 'bg-blue-100' : ''} block w-full px-4 py-2 text-sm text-gray-700 text-left`}
                       >
                         <FiUser className="inline mr-2 h-4 w-4" />
@@ -162,7 +162,7 @@ const NavBar = ({ loading: loadingProp }) => {
                   <MenuItem>
                     {({ active }) => (
                       <button
-                        onClick={() => navigate('/tutorprofileupdate')}
+                        onClick={() => navigate('/learnerprofileupdate')}
                         className={`${active ? 'bg-blue-100' : ''} block w-full px-4 py-2 text-sm text-gray-700 text-left`}
                       >
                         <FiEdit className="inline mr-2 h-4 w-4" />
@@ -213,4 +213,4 @@ const NavBar = ({ loading: loadingProp }) => {
   );
 };
 
-export default NavBar;
+export default HomeNavBar;

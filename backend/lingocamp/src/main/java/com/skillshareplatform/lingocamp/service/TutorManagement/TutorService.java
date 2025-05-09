@@ -48,29 +48,38 @@ public class TutorService {
         return matcher.matches();
     }
 
-    // Register Tutor
-    public String registerTutor(TutorModel tutor) throws ExecutionException, InterruptedException{
-
-        //Email validation
-        if (!isValidEmail(tutor.getEmail())){
+    public String registerTutor(TutorModel tutor, int tutorCount) throws ExecutionException, InterruptedException {
+        if (!isValidEmail(tutor.getEmail())) {
             throw new IllegalArgumentException("Invalid Email Format");
         }
-        
-        //Check for duplicate email
+    
+        if (tutor.getType() == null || 
+            (!tutor.getType().equalsIgnoreCase("tutor") && !tutor.getType().equalsIgnoreCase("company"))) {
+            throw new IllegalArgumentException("Invalid user type. Must be 'tutor' or 'company'");
+        }
+    
+        // Check for duplicate email
         QuerySnapshot existingTutors = firestore.collection("Tutors")
-            .whereEqualTo("email",tutor.getEmail()).get().get();
-        if(!existingTutors.isEmpty()){
+            .whereEqualTo("email", tutor.getEmail()).get().get();
+        if (!existingTutors.isEmpty()) {
             throw new IllegalArgumentException("Email is already in use");
         }
-
-        //Set createAt timeStamp
+    
         tutor.setCreateAt(Timestamp.now());
-
         tutor.setProfileComplete(true);
-
-        //Save tutor to Firestore
+    
+        // Extra: Set defaults if not set for company
+        if (tutor.getType().equalsIgnoreCase("company")) {
+            if (tutor.getCompanyName() == null) {
+                throw new IllegalArgumentException("Company name is required for company type");
+            }
+            if (tutor.getUsername() == null) {
+                throw new IllegalArgumentException("Username is required for company type");
+            }
+        }
+    
         tutorRepository.saveTutor(tutor).get();
-        return "Profile created successfully";
+        return tutor.getUid(); // Return UID
     }
 
     // Complete tutorProfile

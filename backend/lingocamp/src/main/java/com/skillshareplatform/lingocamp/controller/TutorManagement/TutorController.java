@@ -34,12 +34,17 @@ public class TutorController {
     @Autowired
     private Firestore firestore;
     
-    //user register
+     //user register
     @PostMapping("/register")
     public ResponseEntity<String> registerTutor(@RequestBody TutorModel tutor) {
         try{
-            tutorService.registerTutor(tutor);
-            return ResponseEntity.ok("Registered successfully");  
+            //count existing tutors to generate new tutorID
+            QuerySnapshot tutorSnapshot = firestore.collection("Tutors").get().get();
+            int tutorCount = tutorSnapshot.size();
+
+            //Register the tutor and return tutor ID
+            String tutorId = tutorService.registerTutor(tutor, tutorCount);
+            return ResponseEntity.ok(tutorId);  
 
         }catch (IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

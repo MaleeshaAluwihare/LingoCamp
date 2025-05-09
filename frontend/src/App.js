@@ -15,16 +15,26 @@ import CourseDashboard from './pages/CourseManagement/CourseDashboard';
 import CourseUpdate from './pages/CourseManagement/CourseUpdate';
 import Course from './pages/CourseManagement/Courses';
 
-import JobDashboard from './components/JobManagement/JobDashboard';
+import JobDashboard from './pages/JobManagement/JobDashboard';
+import PostJob from './pages/JobManagement/PostJob';
+import JobList from './pages/JobManagement/JobList';
+import AllCompanyPosts from './pages/JobManagement/AllCompanyPosts';
+import CompanyProfile from './pages/JobManagement/CompanyProfile';
+import AllPosts from './pages/AllPost';
 
+import LearnerLogin from './pages/LearnerManagement/LearnerLogin';
+import LearnerProfileCompletion from './pages/LearnerManagement/LearnerProfileCompletion';
+import LearnerProfileUpdate from './pages/LearnerManagement/LearnerProfileUpdate';
+import LearnerProfileView from './pages/LearnerManagement/LearnerProfileView';
+import LearnerHomePage from './pages/LearnerHomePage';
 
-import PostJob from './components/JobManagement/PostJob';
-import JobList from './components/JobManagement/JobList';
-import AllCompanyPosts from './components/JobManagement/AllCompanyPosts';
-import CompanyProfile from './components/JobManagement/CompanyProfile';
-import AllPosts from './components/AllPost';
-
-
+// Shared pages
+import PostSection from './pages/PostManagement/Post';
+import ProfileWithFriendButton from './pages/PostManagement/ProfileFriend';
+import SkillPlanForm from './pages/SkillPlanManagement/SkillPlanAdd';
+import SkillPlansList from './pages/SkillPlanManagement/SkillPlanList';
+import SkillPlansView from './pages/SkillPlanManagement/SkillPlanView';
+import SkillPlanUpdate from './pages/SkillPlanManagement/SkillPlanUpdate'
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -83,6 +93,7 @@ function App() {
     <Router>
       <Routes>
         <Route path='/home' element={<HomePage/>}/>
+        <Route path='/learner-home' element={<LearnerHomePage/>}/>
 
         <Route path='/tutorlogin' element={<TutorLogin/>}/>
         <Route path='/tutorregistration' element={<TutorRegistration/>}/>
@@ -97,14 +108,25 @@ function App() {
         <Route path='/courses' element={<Course/>}/>
 
         <Route path='/jobdashboard' element={<JobDashboard/>}/>
-        
-        
         <Route path='/postjob' element={<PostJob/>}/>
         <Route path='/joblist' element={<JobList/>}/>
 
         <Route path='/allpost' element={<AllCompanyPosts/>}/>
         <Route path="/company-profile" element={<CompanyProfile />} />
         <Route path="/allpost-learner" element={<AllPosts />} />
+
+        <Route path='/learnerlogin' element={<LearnerLogin/>} />
+        <Route path='/learnercompleteprofile' element={<LearnerProfileCompletion/>}/>
+        <Route path='/learnerprofileupdate' element={<LearnerProfileUpdate/>}/>
+        <Route path='/learners/:learnerid' element={<LearnerProfileView/>}/>
+
+        <Route path='/post' element={<PostSection/>}/>
+        <Route path='/skilldetails' element={<SkillPlansList/>}/>
+        <Route path='/friend-profile' element={<ProfileWithFriendButton/>}/>
+
+        <Route path="/skill-plans" element={<SkillPlansView />} />
+        <Route path="/skill-plans/add" element={<SkillPlanForm />} />
+        <Route path="/skill-plans/edit/:planId" element={<SkillPlanUpdate />} />
         
       </Routes>
     </Router>

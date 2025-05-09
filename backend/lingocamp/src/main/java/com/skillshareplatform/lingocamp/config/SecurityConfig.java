@@ -21,14 +21,30 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/lingocamp/api/tutors/register",
                     "/lingocamp/api/tutors/login",
-                    "/lingocamp/api/courses" // GET requests only
+                    "/lingocamp/api/courses", // GET requests only
+
+                    // Learner public endpoints
+                    "/lingocamp/api/learners/**",
+                    "/lingocamp/api/learners/register",
+                    "/lingocamp/api/learners/completeprofile/**",
+                    "/lingocamp/api/learners/updateprofile/**",
+                    "/lingocamp/api/learners/deleteprofile/**",
+                    
+                    // Company posts public endpoint
+                    "/lingocamp/api/company/posts/all"
                 ).permitAll()
                 .requestMatchers(HttpMethod.GET, "/lingocamp/api/tutors/**").permitAll()
                 .requestMatchers(HttpMethod.PATCH, "/lingocamp/api/tutors/updateprofile/**").authenticated()
                 .requestMatchers(HttpMethod.POST, "/lingocamp/api/courses/create").authenticated()
                 .requestMatchers(HttpMethod.POST, "/lingocamp/api/courses/enroll").permitAll()
                 .requestMatchers(HttpMethod.GET, "/lingocamp/api/courses/all").permitAll()
-                // .requestMatchers(HttpMethod.GET, "/lingocamp/api/tutors/public/*").permitAll()
+                .requestMatchers(
+                    "/lingocamp/api/company/posts/all",
+                    "/lingocamp/api/company/posts/create",
+                    "/lingocamp/api/company/posts/my-posts",
+                    "/lingocamp/api/company/posts/update/**",
+                    "/lingocamp/api/company/posts/**"
+                ).authenticated()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(new FirebaseAuthFilter(), UsernamePasswordAuthenticationFilter.class)
