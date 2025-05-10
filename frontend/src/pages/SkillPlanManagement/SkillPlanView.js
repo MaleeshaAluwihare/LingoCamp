@@ -3,7 +3,7 @@ import { FiPlus, FiEdit2, FiTrash2, FiBook, FiCalendar, FiTarget } from 'react-i
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../../firebaseConfig';
 import axios from 'axios';
-import  NavBar  from '../../components/UI/TutorDashBoardNavBar'
+import  NavBar  from '../../components/UI/HomeNavBar'
 
 const SkillPlansView = () => {
   const [skillPlans, setSkillPlans] = useState([]);

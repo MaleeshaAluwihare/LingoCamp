@@ -5,6 +5,8 @@ import { auth } from '../firebaseConfig';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useNavigate } from "react-router-dom";
 import  Navbar  from '../components/UI/TutorDashBoardNavBar';
+import HomeImg1 from '../components/Images/homeImg1.png';
+import HomeImg2 from '../components/Images/homeImg2.png';
 
 const HomePage = () => {
     const [user] = useAuthState(auth);
@@ -113,7 +115,7 @@ const HomePage = () => {
             </div>
             <div className="lg:w-1/2 mt-12 lg:mt-0">
               <img 
-                src="/images/tutor-hero.png" 
+                src={HomeImg1}
                 alt="Tutor creating course"
                 className="rounded-lg shadow-xl hover:shadow-2xl transition-shadow"
               />
@@ -165,7 +167,7 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <img 
-              src="/images/teaching-illustration.png" 
+              src={HomeImg2}
               alt="Teaching benefits"
               className="rounded-lg shadow-xl"
             />

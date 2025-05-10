@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { auth } from '../../firebaseConfig';
 import axios from 'axios';
 import { FiBook, FiCalendar, FiTarget, FiSave, FiX } from 'react-icons/fi';
-import  NavBar  from '../../components/UI/TutorDashBoardNavBar'
+import  NavBar  from '../../components/UI/HomeNavBar';
 
 const SkillPlanForm = ({ isEditing = false }) => {
   const { planId } = useParams();

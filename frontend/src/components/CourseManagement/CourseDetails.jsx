@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { auth } from '../../firebaseConfig';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { InstructorSkeleton } from '../../components/UI/SkeletonLoader';
-import Man from '../UI/man.png'
+import Man from '../Images/man.png'
 import { FiClock, FiBook, FiUsers, FiCheckCircle, FiArrowRight, FiShield, FiArrowLeft, FiStar, FiChevronRight, FiInbox, FiAward, FiMessageSquare, FiDownload, FiCode, FiUserCheck, FiUserX } from 'react-icons/fi';
 
 export default function CourseDetails({ course, onBack }) {
