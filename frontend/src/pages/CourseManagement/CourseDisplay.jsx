@@ -5,7 +5,7 @@ import { auth } from '../../firebaseConfig';
 import { Link } from 'react-router-dom';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import { FiFilter,FiSliders,FiBook,FiInfo } from 'react-icons/fi';
+import { FiFilter,FiSliders,FiBook,FiInfo, FiAlertTriangle } from 'react-icons/fi';
 import  Navbar  from '../../components/UI/TutorDashBoardNavBar'
 
 
@@ -51,40 +51,51 @@ const CourseDisplay = () => {
 
   const handleDelete = async (courseId) => {
     confirmAlert({
-      title: 'Confirm Deletion',
-      message: 'Are you sure you want to remove this course?',
-      buttons: [
-        {
-          text: 'Cancel',
-          className: "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transitionmr-2 px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50",
-          style: { 
-            fontWeight: 'bold', 
-            color: '#1f2937',
-            backgroundColor: 'transparent'
-          }
-        },
-        { 
-          text: 'Delete',
-          className: "bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition",
-          style: { 
-            backgroundColor: '#ef4444', 
-            color: 'white', 
-            fontWeight: 'bold',
-            border: 'none'
-          },
-          onClick: async () => {
-            try {
-              const token = await user.getIdToken();
-              await axios.delete(`http://localhost:8081/lingocamp/api/courses/deletecourse/${courseId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-              });
-              setCourses(courses.filter(course => course.courseId !== courseId));
-            } catch (error) {
-              console.error('Error deleting course:', error);
-            }
-          }
-        }
-      ]
+      customUI: ({ onClose }) => (
+        <div className="bg-white p-6 rounded-lg shadow-xl max-w-md">
+          <div className="text-center">
+            <FiAlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">
+              Delete Course?
+            </h3>
+            <p className="text-gray-600 mb-6">
+              This will permanently remove the course and all its contents. 
+              This action cannot be undone.
+            </p>
+            
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={onClose}
+                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg 
+                          hover:bg-gray-50 transition-colors duration-200 font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                className="px-6 py-2 bg-red-600 text-white rounded-lg 
+                          hover:bg-red-700 transition-colors duration-200 font-medium"
+                onClick={() => {
+                  onClose();
+                  (async () => {
+                    try {
+                      const token = await user.getIdToken();
+                      await axios.delete(
+                        `http://localhost:8081/lingocamp/api/courses/deletecourse/${courseId}`,
+                        { headers: { Authorization: `Bearer ${token}` } }
+                      );
+                      setCourses(courses.filter(course => course.courseId !== courseId));
+                    } catch (error) {
+                      console.error('Error deleting course:', error);
+                    }
+                  })();
+                }}
+              >
+                Delete Course
+              </button>
+            </div>
+          </div>
+        </div>
+      )
     });
   };
 
