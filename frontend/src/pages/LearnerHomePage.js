@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { FiGlobe, FiUsers, FiSmartphone } from 'react-icons/fi';
+import { FiVideo, FiActivity, FiClock, FiTarget, FiAward, FiSmile } from 'react-icons/fi';
 import { auth } from '../firebaseConfig';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import  Navbar  from '../components/UI/HomeNavBar';
+import LHome1 from '../components/Images/LHome1.jpg';
+import LHome2 from '../components/Images/LHome2.jpg';
 
 const LearnerHomePage = () => {
     const [user] = useAuthState(auth);
@@ -34,26 +36,6 @@ const LearnerHomePage = () => {
       fetchUserData();
     },[user]);
 
-    // const handleDashboardNavigation = () => {
-    //   if (isGuest) {
-    //     const confirm = window.confirm(
-    //       'You need a learner account to navigate to dashboard. Would you like to register now?'
-    //     );
-    //     if (confirm) {
-    //       navigate('/learnerregistration');
-    //     }
-    //   } else if (user) {
-    //     navigate('/coursedashboard');
-    //   } else {
-    //     const confirm = window.confirm(
-    //       'You need to be logged in to navigate to dashboard. Go to login page now?'
-    //     );
-    //     if (confirm) {
-    //       navigate('/learnerlogin');
-    //     }
-    //   }
-    // };
-
     const handleDashboardNavigation = () => {
       if (!isGuest && user) {
         navigate('/skill-plans');
@@ -77,71 +59,168 @@ const LearnerHomePage = () => {
       }
     }, [user]);   
 
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navbar/>
+   return (
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <Navbar />
+      
       {/* Hero Section */}
       <main>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center py-20">
-            <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl md:text-6xl">
-              {!loading && (
-                <span className="block text-2xl text-blue-600 mb-4">
-                  Welcome back, {getDisplayName()}!
-                </span>
-              )}
-              Learn Languages Naturally with
-              <span className="text-blue-600"> LingoCamp</span>
-            </h1>
-            <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-              Immerse yourself in real conversations with native speakers from around the world.
-            </p>
-            <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
-              <button
-                onClick={handleDashboardNavigation}
-                className={`${
-                  isGuest || !user ? 'bg-gray-400 hover:bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'
-                } text-white p-3 rounded-lg transition-colors`}
-                title={isGuest ? "Guest users cannot started" : !user ? "Login to navigate" : ""}
-              >
-                Get Started learner
-              </button>
+          <div className="py-20 flex flex-col lg:flex-row items-center gap-12">
+            <div className="lg:w-1/2 space-y-8 text-center lg:text-left">
+              <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl md:text-6xl">
+                {!loading && (
+                  <span className="block text-2xl text-blue-600 mb-4">
+                    Welcome back, {getDisplayName()}!
+                  </span>
+                )}
+                Master Languages Through
+                <span className="text-blue-600"> Real Conversations</span>
+              </h1>
+              <p className="text-xl text-gray-600 md:max-w-2xl mx-auto lg:mx-0">
+                Connect with certified tutors and language partners for immersive learning experiences 
+                that adapt to your pace and goals.
+              </p>
+              <div className="flex gap-4 justify-center lg:justify-start">
+                <button
+                  onClick={handleDashboardNavigation}
+                  className={`${
+                    isGuest || !user 
+                      ? 'bg-gray-400 hover:bg-gray-400 cursor-not-allowed' 
+                      : 'bg-blue-600 hover:bg-blue-700'
+                  } text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all transform hover:scale-105`}
+                >
+                  {user ? 'Continue Learning' : 'Start Your Journey'}
+                </button>
+                {!user && (
+                  <button
+                    onClick={() => navigate('/learnerlogin')}
+                    className="bg-white border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-xl text-lg font-semibold hover:bg-blue-50 transition-colors"
+                  >
+                    Learner Login
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="lg:w-1/2 mt-12 lg:mt-0">
+              <img 
+                src={LHome2} 
+                alt="Happy language learners"
+                className="rounded-lg shadow-xl hover:shadow-2xl transition-shadow"
+              />
             </div>
           </div>
         </div>
       </main>
 
       {/* Features Section */}
-      <section className="py-12 bg-white" id="features">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            <div className="p-6 border rounded-lg hover:shadow-lg transition-shadow">
-              <FiUsers className="h-12 w-12 text-blue-600" />
-              <h3 className="mt-4 text-xl font-semibold">Native Speakers</h3>
-              <p className="mt-2 text-gray-500">
-                Connect with language partners who are native speakers of your target language.
+          <h2 className="text-3xl font-bold text-center mb-12">Why Choose LingoCamp?</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
+                <FiVideo className="w-8 h-8 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Live Tutoring</h3>
+              <p className="text-gray-600">
+                Interactive 1-on-1 sessions with certified language experts.
               </p>
             </div>
-            <div className="p-6 border rounded-lg hover:shadow-lg transition-shadow">
-              <FiSmartphone className="h-12 w-12 text-blue-600" />
-              <h3 className="mt-4 text-xl font-semibold">Mobile Friendly</h3>
-              <p className="mt-2 text-gray-500">
-                Learn anywhere, anytime with our mobile-optimized platform.
+            
+            <div className="p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
+                <FiActivity className="w-8 h-8 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Progress Tracking</h3>
+              <p className="text-gray-600">
+                Visualize your improvement with personalized analytics dashboards.
               </p>
             </div>
-            <div className="p-6 border rounded-lg hover:shadow-lg transition-shadow">
-              <FiGlobe className="h-12 w-12 text-blue-600" />
-              <h3 className="mt-4 text-xl font-semibold">100+ Languages</h3>
-              <p className="mt-2 text-gray-500">
-                Choose from a wide variety of languages and dialects from around the world.
+
+            <div className="p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
+                <FiClock className="w-8 h-8 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Flexible Scheduling</h3>
+              <p className="text-gray-600">
+                Learn anytime that works for you - 24/7 availability worldwide.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white mt-12">
+      {/* Learning Benefits Section */}
+      <section className="py-16 bg-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl font-bold mb-8">Your Path to Fluency</h2>
+              <div className="space-y-8">
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
+                    <FiTarget className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold">Personalized Learning</h3>
+                    <p className="text-gray-600 mt-2">
+                      Custom lesson plans tailored to your goals and learning style.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
+                    <FiAward className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold">Certified Experts</h3>
+                    <p className="text-gray-600 mt-2">
+                      Learn from qualified tutors with proven teaching experience.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
+                    <FiSmile className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold">Community Support</h3>
+                    <p className="text-gray-600 mt-2">
+                      Join study groups and language exchange communities.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <img 
+              src={LHome1} 
+              alt="Learning benefits"
+              className="rounded-lg shadow-xl order-first md:order-last"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 bg-blue-600 text-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold mb-6">Start Speaking Confidently Today!</h2>
+          <p className="text-xl mb-8">
+            Join 500,000+ learners who've achieved their language goals with LingoCamp
+          </p>
+          <button
+            onClick={handleDashboardNavigation}
+            className="bg-white text-blue-600 px-10 py-4 rounded-xl text-lg font-semibold hover:bg-blue-50 transition-colors"
+          >
+            {user ? 'Continue Learning' : 'Begin Free Trial'}
+          </button>
+        </div>
+      </section>
+
+      <footer className="bg-gray-800 text-white">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="text-center">
             <p className="text-gray-400">
