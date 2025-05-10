@@ -5,7 +5,7 @@ import { Bar, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import { auth } from '../../firebaseConfig';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import  Navbar  from '../../components/UI/navBar'
+import  Navbar  from '../../components/UI/TutorDashBoardNavBar'
 
 ChartJS.register(...registerables);
 

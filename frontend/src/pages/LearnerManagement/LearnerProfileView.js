@@ -10,7 +10,7 @@ import {
   FaGithub, FaMedium, FaReddit 
 } from 'react-icons/fa';
 import { SkeletonLoader } from '../../components/UI/SkeletonLoader';
-import NavBar from '../../components/UI/navBar';
+import NavBar from '../../components/UI/TutorDashBoardNavBar';
 import { auth } from '../../firebaseConfig';
 import { useAuthState } from 'react-firebase-hooks/auth';
 

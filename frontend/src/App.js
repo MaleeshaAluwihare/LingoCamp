@@ -20,7 +20,8 @@ import PostJob from './pages/JobManagement/PostJob';
 import JobList from './pages/JobManagement/JobList';
 import AllCompanyPosts from './pages/JobManagement/AllCompanyPosts';
 import CompanyProfile from './pages/JobManagement/CompanyProfile';
-import AllPosts from './pages/AllPost';
+import AllPosts from './pages/JobManagement/AllPost';
+import CompanyLogin from './pages/JobManagement/CompanyLogin'
 
 import LearnerLogin from './pages/LearnerManagement/LearnerLogin';
 import LearnerProfileCompletion from './pages/LearnerManagement/LearnerProfileCompletion';
@@ -110,10 +111,10 @@ function App() {
         <Route path='/jobdashboard' element={<JobDashboard/>}/>
         <Route path='/postjob' element={<PostJob/>}/>
         <Route path='/joblist' element={<JobList/>}/>
-
         <Route path='/allpost' element={<AllCompanyPosts/>}/>
         <Route path="/company-profile" element={<CompanyProfile />} />
         <Route path="/allpost-learner" element={<AllPosts />} />
+        <Route path="/companylogin" element={<CompanyLogin/>} />
 
         <Route path='/learnerlogin' element={<LearnerLogin/>} />
         <Route path='/learnercompleteprofile' element={<LearnerProfileCompletion/>}/>

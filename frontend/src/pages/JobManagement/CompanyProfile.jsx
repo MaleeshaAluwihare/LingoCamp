@@ -11,7 +11,7 @@ const CompanyProfile = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(getAuth(), async (user) => {
       if (!user) {
-        navigate("/tutorlogin");
+        navigate("/companylogin");
         return;
       }
 
@@ -19,7 +19,7 @@ const CompanyProfile = () => {
         const token = await user.getIdToken();
         const uid = user.uid;
 
-        const res = await axios.get(`http://localhost:8081/lingocamp/api/tutors/${uid}`, {
+        const res = await axios.get(`http://localhost:8081/lingocamp/api/company/${uid}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

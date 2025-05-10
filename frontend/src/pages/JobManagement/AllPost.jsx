@@ -1,6 +1,6 @@
 // AllPosts.js
 import React, { useState, useEffect } from "react";
-import { fetchAllCompanyPosts } from "../services/apiService";
+import { fetchAllCompanyPosts } from "../../services/apiService";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import { FiUser } from 'react-icons/fi';
@@ -84,9 +84,6 @@ const AllPosts = () => {
                       </p>
                     </div>
                   </div>
-                  <button className="absolute top-0 right-0 px-4 py-2 bg-blue-600 text-white rounded-md">
-                    Apply Job
-                  </button>
                 </div>
                 <p className="mb-2">{post.description}</p>
                 {post.mediaUrls?.length > 0 && (

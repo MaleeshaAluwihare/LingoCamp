@@ -31,20 +31,19 @@ public class SecurityConfig {
                     "/lingocamp/api/learners/deleteprofile/**",
                     
                     // Company posts public endpoint
-                    "/lingocamp/api/company/posts/all"
+                    "/lingocamp/api/company/posts/all",
+                    "/lingocamp/api/company/register",
+
+                    "/lingocamp/api/company/posts/create",
+                    "/lingocamp/api/company/posts/myposts",
+                    "/lingocamp/api/company/posts/update/**",
+                    "/lingocamp/api/company/posts/**"
                 ).permitAll()
                 .requestMatchers(HttpMethod.GET, "/lingocamp/api/tutors/**").permitAll()
                 .requestMatchers(HttpMethod.PATCH, "/lingocamp/api/tutors/updateprofile/**").authenticated()
                 .requestMatchers(HttpMethod.POST, "/lingocamp/api/courses/create").authenticated()
                 .requestMatchers(HttpMethod.POST, "/lingocamp/api/courses/enroll").permitAll()
                 .requestMatchers(HttpMethod.GET, "/lingocamp/api/courses/all").permitAll()
-                .requestMatchers(
-                    "/lingocamp/api/company/posts/all",
-                    "/lingocamp/api/company/posts/create",
-                    "/lingocamp/api/company/posts/my-posts",
-                    "/lingocamp/api/company/posts/update/**",
-                    "/lingocamp/api/company/posts/**"
-                ).authenticated()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(new FirebaseAuthFilter(), UsernamePasswordAuthenticationFilter.class)

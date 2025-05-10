@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { FiFilter,FiSliders,FiBook,FiInfo } from 'react-icons/fi';
-import  Navbar  from '../../components/UI/navBar'
+import  Navbar  from '../../components/UI/TutorDashBoardNavBar'
 
 
 const CourseDisplay = () => {

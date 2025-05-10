@@ -12,7 +12,7 @@ import { v4 as uuidv4 } from "uuid";
 import MDEditor from '@uiw/react-md-editor';
 import { useDropzone } from 'react-dropzone';
 import { FiBook, FiImage, FiDollarSign, FiCalendar, FiCheck, FiGlobe, FiFile } from 'react-icons/fi';
-import  Navbar  from '../../components/UI/navBar'
+import  Navbar  from '../../components/UI/TutorDashBoardNavBar'
 
 const CourseCreation = () => {
   const { register, handleSubmit, formState: { errors } } = useForm({defaultValues: {categories: ""}});

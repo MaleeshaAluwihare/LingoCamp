@@ -6,7 +6,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, storage } from '../../firebaseConfig';
 import { useNavigate } from 'react-router-dom';
 import { FiUploadCloud, FiX, FiPlus, FiLink, FiUser, FiBriefcase, FiAward } from 'react-icons/fi';
-import NavBar from '../../components/UI/navBar';
+import NavBar from '../../components/UI/TutorDashBoardNavBar';
 
 const TutorProfileUpdate = () => {
   const { register, handleSubmit, setValue, formState: { errors } } = useForm();

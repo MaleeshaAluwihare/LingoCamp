@@ -18,5 +18,8 @@ public class CompanyPostModel {
     private String companyEmail;
     private String companyProfileImage;
     
+
+    
+
     public CompanyPostModel() {}
 }

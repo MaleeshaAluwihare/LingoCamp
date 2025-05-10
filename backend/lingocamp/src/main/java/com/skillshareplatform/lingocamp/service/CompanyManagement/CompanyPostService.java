@@ -32,9 +32,9 @@ public class CompanyPostService {
         }
     
         // ✅ Fetch email and profile image from Tutors collection
-        DocumentSnapshot tutorDoc = firestore.collection("Tutors").document(uid).get().get();
-        String email = tutorDoc.contains("email") ? tutorDoc.getString("email") : null;
-        String profileImg = tutorDoc.contains("profileImageUrl") ? tutorDoc.getString("profileImageUrl") : null;
+        DocumentSnapshot CompanyDoc = firestore.collection("Companies").document(uid).get().get();
+        String email = CompanyDoc.contains("email") ? CompanyDoc.getString("email") : null;
+        String profileImg = CompanyDoc.contains("profileImageUrl") ? CompanyDoc.getString("profileImageUrl") : null;
     
         CompanyPostModel post = new CompanyPostModel();
         post.setPostId(UUID.randomUUID().toString());
@@ -110,5 +110,12 @@ public class CompanyPostService {
 
         System.out.println("🔥 All Posts Fetched: " + allPosts.size());
         return allPosts;
-    }   
+    }
+
+
+
+
+
+
+    
 }

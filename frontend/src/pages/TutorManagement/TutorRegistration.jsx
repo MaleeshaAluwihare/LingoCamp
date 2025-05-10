@@ -274,10 +274,14 @@ const TutorRegistration = () => {
       console.log("Submitting to backend:", formData);
 
       // Send to backend - different endpoints based on user type
-      const endpoint =
-        userType === "learner"
-          ? `${API_BASE_URL}/lingocamp/api/learners/register`
-          : `${API_BASE_URL}/lingocamp/api/tutors/register`;
+      const endpoints = {
+        learner: `${API_BASE_URL}/lingocamp/api/learners/register`,
+        tutor: `${API_BASE_URL}/lingocamp/api/tutors/register`,
+        company: `${API_BASE_URL}/lingocamp/api/company/register`,
+      };
+
+      const endpoint = endpoints[userType] || null;
+
 
       const response = await axios.post(endpoint, formData, {
         headers: {

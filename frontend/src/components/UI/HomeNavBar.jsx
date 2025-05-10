@@ -95,9 +95,9 @@ const HomeNavBar = ({ loading: loadingProp }) => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             <Link to="/courses" className="text-gray-600 hover:text-blue-600">Courses</Link>
+            <Link to="/allpost-learner" className="text-gray-600 hover:text-blue-600">Jobs</Link>
             <a href="#features" className="text-gray-600 hover:text-blue-600">About Us</a>
             <a href="#pricing" className="text-gray-600 hover:text-blue-600">FAQ</a>
-            <a href="#pricing" className="text-gray-600 hover:text-blue-600">Pricing</a>
             {!user && (
               <div className="flex items-center space-x-4">
                 {/* Login Dropdown */}

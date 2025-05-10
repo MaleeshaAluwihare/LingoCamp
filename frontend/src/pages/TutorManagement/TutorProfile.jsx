@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { FiBriefcase, FiGlobe, FiMail, FiPhone, FiUser, FiLink, FiAward } from 'react-icons/fi';
 import {SkeletonLoader} from '../../components/UI/SkeletonLoader';
-import NavBar from '../../components/UI/navBar';
+import NavBar from '../../components/UI/TutorDashBoardNavBar';
 
 const TutorProfile = () => {
   const { tutoruid } = useParams();

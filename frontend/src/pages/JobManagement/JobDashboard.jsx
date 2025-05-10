@@ -6,11 +6,13 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { storage } from "../../firebaseConfig";
 import axios from "axios";
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth, storage } from '../../firebaseConfig';
+
 
 const CompanyDashboard = () => {
-  const [authLoaded, setAuthLoaded] = useState(false);
+  const [user] = useAuthState(auth);
   const [userEmail, setUserEmail] = useState("");
   const [companyInfo, setCompanyInfo] = useState(null);
   const [posts, setPosts] = useState([]);
@@ -27,55 +29,35 @@ const CompanyDashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(getAuth(), async (user) => {
-      if (!user) {
-        navigate("/tutorlogin");
-        return;
-      }
+    const postFetch = async () => {
+      if(user){
+        try{
+            const token = await user.getIdToken();
+            const uid = user.uid;
 
-      try {
-        const token = await user.getIdToken();
-        const uid = user.uid;
-        setUserEmail(user.email);
+            console.log("token",token)
+            console.log("uid",uid)
 
-        const postRes = await axios.get(
-          "http://localhost:8081/lingocamp/api/company/posts/my-posts",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setPosts(postRes.data);
+            setUserEmail(user.email);
 
-        const infoRes = await axios.get(
-          `http://localhost:8081/lingocamp/api/tutors/${uid}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        const userInfo = infoRes.data;
+            const postResponse = await axios.get(`http://localhost:8081/lingocamp/api/company/posts/myposts`,
+            { headers: { Authorization: `Bearer ${token}` } });
 
-        if (userInfo.type !== "company") {
-          alert("Access denied: Only company users can access the dashboard.");
-          navigate("/home"); // 👈 Redirect to another page
-          return;
+            setPosts(postResponse.data);
+
+            const infoResponse = await axios.get(`http://localhost:8081/lingocamp/api/company/${uid}`,
+            { headers: { Authorization: `Bearer ${token}` } });
+
+            setCompanyInfo(infoResponse.data);
+
+        }catch (error) {
+          console.error("Error loading dashboard data:", error);
         }
-        setCompanyInfo(infoRes.data);
-      } catch (error) {
-        console.error("Error loading dashboard data:", error);
       }
+    };
+    postFetch();
 
-      setAuthLoaded(true);
-    });
-
-    return () => unsubscribe();
-  }, [navigate]);
-
-  if (!authLoaded)
-    return (
-      <div className="p-8 text-center text-gray-600">
-        Loading your dashboard...
-      </div>
-    );
+    },[user, navigate]);
 
   const company = {
     name: "Acme Corporation",
@@ -102,7 +84,7 @@ const CompanyDashboard = () => {
     const auth = getAuth();
     try {
       await signOut(auth);
-      navigate("/tutorlogin");
+      navigate("/companylogin");
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -175,18 +157,13 @@ const CompanyDashboard = () => {
     }
 
     try {
-      await axios.post(
-        "http://localhost:8081/lingocamp/api/company/posts/create",
+      await axios.post(`http://localhost:8081/lingocamp/api/company/posts/create`,
         {
           description,
           mediaUrls,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+        { headers: { Authorization: `Bearer ${token}` } });
+
 
       setShowPostForm(false);
       form.reset();
@@ -302,12 +279,7 @@ const CompanyDashboard = () => {
             >
               allpost
             </span>
-            <span
-              className="cursor-pointer font-semibold text-blue-600 pb-1"
-              onClick={() => navigate("/joblist")}
-            >
-              Jobs
-            </span>
+            
 
             <div className="relative group">
               <button className="text-sm font-medium text-blue-700 focus:outline-none">
@@ -386,17 +358,6 @@ const CompanyDashboard = () => {
                     ))}
                   </div>
                 )}
-              </div>
-
-              <div className="flex space-x-2">
-
-                <button
-                  className="py-1 px-4 border border-blue-600 rounded-full text-blue-600 font-medium hover:bg-blue-50"
-                  onClick={() => navigate("/joblist")}
-                >
-                  <span>Previously Applied Jobs</span>
-                </button>
-
               </div>
 
               {/* Password Modal */}
