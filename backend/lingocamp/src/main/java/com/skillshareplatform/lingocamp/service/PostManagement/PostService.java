@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -83,4 +86,46 @@ public class PostService {
 
         docRef.set(updatedPost).get();
     }
+
+    public void likePost(String postId, String userId) throws ExecutionException, InterruptedException {
+        DocumentReference postRef = firestore.collection("Posts").document(postId);
+        DocumentSnapshot snapshot = postRef.get().get();
+
+        if (!snapshot.exists()) {
+            throw new NoSuchElementException("Post not found");
+        }
+
+        List<String> likes = (List<String>) snapshot.get("likes");
+        if (likes == null) {
+            likes = new ArrayList<>();
+        }
+
+        if (!likes.contains(userId)) {
+            likes.add(userId);
+            postRef.update("likes", likes);
+        }
+    }
+
+    public void commentOnPost(String postId, String userId, String commentText) throws ExecutionException, InterruptedException {
+        DocumentReference postRef = firestore.collection("Posts").document(postId);
+        DocumentSnapshot snapshot = postRef.get().get();
+
+        if (!snapshot.exists()) {
+            throw new NoSuchElementException("Post not found");
+        }
+
+        Map<String, Object> comment = new HashMap<>();
+        comment.put("userId", userId);
+        comment.put("comment", commentText);
+        comment.put("timestamp", System.currentTimeMillis());
+
+        List<Map<String, Object>> comments = (List<Map<String, Object>>) snapshot.get("comments");
+        if (comments == null) {
+            comments = new ArrayList<>();
+        }
+
+        comments.add(comment);
+        postRef.update("comments", comments);
+    }
+
 }
