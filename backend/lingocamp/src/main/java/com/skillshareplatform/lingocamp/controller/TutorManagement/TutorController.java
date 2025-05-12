@@ -38,12 +38,8 @@ public class TutorController {
     @PostMapping("/register")
     public ResponseEntity<String> registerTutor(@RequestBody TutorModel tutor) {
         try{
-            //count existing tutors to generate new tutorID
-            QuerySnapshot tutorSnapshot = firestore.collection("Tutors").get().get();
-            int tutorCount = tutorSnapshot.size();
-
             //Register the tutor and return tutor ID
-            String tutorId = tutorService.registerTutor(tutor, tutorCount);
+            String tutorId = tutorService.registerTutor(tutor);
             return ResponseEntity.ok(tutorId);  
 
         }catch (IllegalArgumentException e){
@@ -100,13 +96,18 @@ public class TutorController {
     @PostMapping("/completeprofile/{uid}")
     public ResponseEntity<String> completeProfile(
         @PathVariable String uid,
-        @RequestBody TutorModel tutorData
+        @RequestBody TutorModel tutorData,
+        HttpServletRequest request 
     ) {
         try {
-            QuerySnapshot tutorSnapshot = firestore.collection("Tutors").get().get();
-            int tutorCount = tutorSnapshot.size();
 
-            String result = tutorService.completeTutorProfile(uid, tutorData, tutorCount);
+            FirebaseToken decodedToken = (FirebaseToken) request.getAttribute("firebaseToken");
+    
+            if (decodedToken == null || !decodedToken.getUid().equals(uid)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized profile completion");
+            }
+
+            String result = tutorService.completeTutorProfile(uid, tutorData);
             return ResponseEntity.ok(result);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

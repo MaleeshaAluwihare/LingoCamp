@@ -78,26 +78,40 @@ const ProfileCompletion = () => {
         setSocialLinks(socialLinks.filter((_, i) => i !== index));
       };
     
-    const onSubmit = async (data) => {
-        try {
-            const formData = {
-                ...data,
-                uid: user.uid,
-                email: user.email, // Auto-populate from Google
-                profileImageUrl: await handleImageUpload(),
-                specialization: specializations,
-                socialLinks: socialLinks,
-                profileComplete: true
-            };
+  const onSubmit = async (data) => {
+    try {
+        setLoading(true);
+        
+        // Get fresh Firebase ID token
+        const idToken = await user.getIdToken(); // Force token refresh if needed
+        
+        const formData = {
+            ...data,
+            uid: user.uid,
+            email: user.email,
+            profileImageUrl: await handleImageUpload(),
+            specialization: specializations,
+            socialLinks: socialLinks,
+            profileComplete: true
+        };
 
-            await axios.post(`http://localhost:8081/lingocamp/api/tutors/completeprofile/${user.uid}`, formData);
-            navigate('/home');
-        } catch (error) {
-            console.error('Profile completion failed:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+        await axios.post(
+            `http://localhost:8081/lingocamp/api/tutors/completeprofile/${user.uid}`,
+            formData,
+            {
+                headers: {
+                    Authorization: `Bearer ${idToken}`
+                }
+            }
+        );
+        
+        navigate('/home');
+    } catch (error) {
+        console.error('Profile completion failed:', error);
+    } finally {
+        setLoading(false);
+    }
+};
 
 return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">

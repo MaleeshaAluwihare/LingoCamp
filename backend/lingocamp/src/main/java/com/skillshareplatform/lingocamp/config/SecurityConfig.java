@@ -41,6 +41,7 @@ public class SecurityConfig {
                 ).permitAll()
                 .requestMatchers(HttpMethod.GET, "/lingocamp/api/tutors/**").permitAll()
                 .requestMatchers(HttpMethod.PATCH, "/lingocamp/api/tutors/updateprofile/**").authenticated()
+                .requestMatchers(HttpMethod.POST, "/lingocamp/api/tutors/completeprofile/**").authenticated()
                 .requestMatchers(HttpMethod.POST, "/lingocamp/api/courses/create").authenticated()
                 .requestMatchers(HttpMethod.POST, "/lingocamp/api/courses/enroll").permitAll()
                 .requestMatchers(HttpMethod.GET, "/lingocamp/api/courses/all").permitAll()

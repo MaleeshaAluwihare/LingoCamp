@@ -48,7 +48,7 @@ public class TutorService {
         return matcher.matches();
     }
 
-    public String registerTutor(TutorModel tutor, int tutorCount) throws ExecutionException, InterruptedException {
+    public String registerTutor(TutorModel tutor) throws ExecutionException, InterruptedException {
         if (!isValidEmail(tutor.getEmail())) {
             throw new IllegalArgumentException("Invalid Email Format");
         }
@@ -68,22 +68,12 @@ public class TutorService {
         tutor.setCreateAt(Timestamp.now());
         tutor.setProfileComplete(true);
     
-        // Extra: Set defaults if not set for company
-        if (tutor.getType().equalsIgnoreCase("company")) {
-            if (tutor.getCompanyName() == null) {
-                throw new IllegalArgumentException("Company name is required for company type");
-            }
-            if (tutor.getUsername() == null) {
-                throw new IllegalArgumentException("Username is required for company type");
-            }
-        }
-    
         tutorRepository.saveTutor(tutor).get();
         return tutor.getUid(); // Return UID
     }
 
     // Complete tutorProfile
-    public String completeTutorProfile(String uid, TutorModel tutorData, int tutorCount) 
+    public String completeTutorProfile(String uid, TutorModel tutorData) 
     throws ExecutionException, InterruptedException {
     
         DocumentSnapshot doc = firestore.collection("Tutors").document(uid).get().get();

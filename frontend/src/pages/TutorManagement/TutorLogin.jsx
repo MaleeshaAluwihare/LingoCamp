@@ -26,8 +26,14 @@ const TutorLogin = () => {
     const handleGoogleLogin = async () => {
         try {
             const result = await signInWithPopup(auth, googleProvider);
+            const idToken = await result.user.getIdToken();
             try {
-                await axios.get(`http://localhost:8081/lingocamp/api/tutors/${result.user.uid}`);
+                await axios.get(`http://localhost:8081/lingocamp/api/tutors/${result.user.uid}`, {
+                    headers: {
+                    Authorization: `Bearer ${idToken}`
+                    }
+                });
+
                 localStorage.removeItem('isGuest'); 
                 navigate('/home');
             } catch (error) {
